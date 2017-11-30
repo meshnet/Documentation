@@ -54,7 +54,7 @@ November 2017                                             Node to Node Protocol
 
   2.1 Protocol Description .................................................. 4
   2.2 Frame ................................................................. 5
-  2.3 Device Identifaction  ................................................. 5
+  2.3 Device Identification  ................................................ 5
   2.4 Packet Type ........................................................... 6
   2.5 Payload ............................................................... 6
   2.6 Version & Length ...................................................... 6
@@ -123,7 +123,7 @@ November 2017                                             Node to Node Protocol
 
                                 1.  INTRODUCTION
 
-The Node to Node protocol (N2NP) is intented for use as a reliable host-to-host
+The Node to Node protocol (N2NP) is intended for use as a reliable host-to-host
 protocol between node devices (hosts) in packet-switched embedded computer
 communication networks over radio waves.
 
@@ -142,13 +142,13 @@ device driver.
 
 1.2.  Abbreviations
 
-  ┏━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-  ┃ Abbrevation ┃ Meaning                                                     ┃
-  ┡━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-  │ N2NP        │ Node-to-Node protocol                                       │
-  ├─────────────┼─────────────────────────────────────────────────────────────┤
-  │ HW          │ Hardware                                                    │
-  └─────────────┴─────────────────────────────────────────────────────────────┘
+  ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ Abbreviation ┃ Meaning                                                    ┃
+  ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+  │ N2NP         │ Node-to-Node protocol                                      │
+  ├──────────────┼────────────────────────────────────────────────────────────┤
+  │ HW           │ Hardware                                                   │
+  └──────────────┴────────────────────────────────────────────────────────────┘
 
 1.3.  References
 
@@ -182,7 +182,7 @@ November 2017                                             Node to Node Protocol
 
   The N2NP protocol is over the physical layer [Figure 1]
   The physical layer is charged with transportation of the packet, and will be
-  likely over radio waves, with low frequencies. That implies very low bandwith,
+  likely over radio waves, with low frequencies. That implies very low bandwidth,  < Characters beyond page
   and the protocol must be designed with this requirement in mind.
   Since it does not handle transportation, the N2NP protocol can focus on the
   Routing and the data side of a communication.
@@ -224,15 +224,15 @@ November 2017                                             Node to Node Protocol
 └───────┴─────────────────────────────────────────────────────────────────────┘
 
 
-2.3  Device Identifaction
+2.3  Device Identification
 
   In order to identify a device from another, the N2NP protocol use an hashed
-  identifier, on 4 bytes. The orignal hashed content and the size of those
+  identifier, on 4 bytes. The original hashed content and the size of those
   fields are not decided yet, so those are subjects to changes.
   In a packet, the protocol shall define a source identifier (FROM) and a
   destination identifier (TO). These fields are to be used by the neighbors
   nodes in order to relay the packet to its final destination.
-  A routing algorithm could be used too, in order to accelerate this processus.
+  A routing algorithm could be used too, in order to accelerate this process.
 
 
 
@@ -266,7 +266,7 @@ November 2017                                             Node to Node Protocol
                           .... 0101 = Minor Version 5
 
 
-  The lentgh field describe the total length of the packet, starting from byte
+  The length field describe the total length of the packet, starting from byte
   0 of the N2NP header to last byte of the data field. It is, for now, on a
   single byte, but that does limit the total size of a packet to 255 bytes.
 
@@ -287,7 +287,7 @@ November 2017                                             Node to Node Protocol
 
   The PING packet type describe an action to test the reachability and the
   availability of a device. This type does not have any data paired with.
-  On a PING, a device shall respond with a PONG in order to assure the orignal
+  On a PING, a device shall respond with a PONG in order to assure the original
   sender of its reachability.
   It is described with the value 0x1 (1) in the packet type field.
 
@@ -432,8 +432,8 @@ November 2017                                             Node to Node Protocol
   These are an hash on 16 bits, describing an User identifier. The source User
   ID must be the one of the packet sender. It is worth noting that if the flag
   CHAN is used in flags field, the Destination ID does not describe a user
-  anymore, but a channel. See 4.1.3 section for more informations about flags.
-  One might think that this information is redondant with the devices IDs in the
+  anymore, but a channel. See 4.1.3 section for more information about flags.
+  One might think that this information is redundant with the devices IDs in the  < Characters beyond page
   header, but the service should be able to support multiple users on a single
   device.
                                                                       [Page 10]
@@ -461,7 +461,7 @@ November 2017                                             Node to Node Protocol
 
 4.1.3.  Flags
 
-  The Flags field is used to describe multiple boolean informations
+  The Flags field is used to describe multiple boolean information
 
                                1... .... = ACK
                                .1.. .... = CHA
@@ -473,7 +473,7 @@ November 2017                                             Node to Node Protocol
                                .... ...1 = Unused
 
   The ACK flag describes an acknowledgment of data. If the ACK flag is set,
-  the sequence number field shall contain the sequence of the data acknowledged.
+  the sequence number field shall contain the sequence of the data acknowledged.  < Characters beyond page
 
 
                                                                       [Page 11]
@@ -481,7 +481,7 @@ November 2017                                             Node to Node Protocol
 ───────────────────────────────────────────────────────────────────────────────
 November 2017                                             Node to Node Protocol
 
-  The CHA flag describes a special case for the Destination User ID. If the flag
+  The CHA flag describes a special case for the Destination User ID. If the flag  < Characters beyond page
   is set, the Destination UserID field is not an UserID anymore, but rather a
   ChannelID, based on the same principle that a UserID.
 
@@ -512,7 +512,7 @@ November 2017                                             Node to Node Protocol
 
 4.1.4.  Message
 
-  The Message field contain the payload message sent by the user to another one.
+  The Message field contain the payload message sent by the user to another one.  < Characters beyond page
   It is assumed that this field is encoded with utf-8. The size of this field
   is described in the Message Length field. If this field is set at 0, it is
   assumed that the Message field will be empty.
