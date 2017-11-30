@@ -1,0 +1,520 @@
+───────────────────────────────────────────────────────────────────────────────
+
+
+
+                             NODE TO NODE PROTOCOL
+
+
+                                MESHNET PROJECT
+
+                             PROTOCOL SPECIFICATION
+
+                                THIS IS A DRAFT
+
+                                 November 2017
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              louis@ne02ptzero.me
+
+
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
+                               TABLE OF CONTENTS
+
+
+1.  INTRODUCTION ............................................................ 3
+
+  1.1 Scope of this document ................................................ 3
+  1.2 Abbreviations ......................................................... 3
+  1.3 References ............................................................ 3
+
+2.  GENERAL DESCRIPTION ..................................................... 4
+
+  2.1 Protocol Description .................................................. 4
+  2.2 Frame ................................................................. 5
+  2.3 Device Identifaction  ................................................. 5
+  2.4 Packet Type ........................................................... 6
+  2.5 Payload ............................................................... 6
+  2.6 Version & Length ...................................................... 6
+
+3.  PACKET TYPES ............................................................ 7
+
+  3.1 PING .................................................................. 7
+  3.2 PONG .................................................................. 7
+  3.3 SERVICE ............................................................... 7
+
+4. SERVICES .................................................................
+
+  4.1 CHAT ................................................................. 10
+    4.1.1 Source and Destination User ID ................................... 10
+    4.1.2 Sequence Number .................................................. 11
+    4.1.3 Flags ............................................................ 11
+    4.1.4 Message .......................................................... 12
+
+
+
+
+                                                                       [Page 1]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                       [Page 2]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
+                                1.  INTRODUCTION
+
+The Node to Node protocol (N2NP) is intented for use as a reliable host-to-host
+protocol between node devices (hosts) in packet-switched embedded computer
+communication networks over radio waves.
+
+This document describes the function to be performed by the Node to Node
+Protocol, the programs that implements it, and its interface through a kernel
+device driver.
+
+
+1.1.  Scope of this document
+
+  N2NP is a transport and applicative layer for the MeshNet project. It
+  provides communication between two nodes, through radio signals. The physical
+  layer (radio) is not yet defined as of this day, and it's not in the scope of
+  this document. This document shall describe the internal mechanisms of the
+  protocol, and its integration within the MeshNet project.
+
+1.2.  Abbreviations
+
+  ┏━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃ Abbrevation ┃ Meaning                                                     ┃
+  ┡━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+  │ N2NP        │ Node-to-Node protocol                                       │
+  ├─────────────┼─────────────────────────────────────────────────────────────┤
+  │ HW          │ Hardware                                                    │
+  └─────────────┴─────────────────────────────────────────────────────────────┘
+
+1.3.  References
+
+  [1] TCP RFC793 https://tools.ietf.org/html/rfc793
+
+
+
+                                                                       [Page 3]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
+                            2.  GENERAL DESCRIPTION 
+
+2.1.  Protocol Description
+
+
+                               Protocol Layering
+
+                              +------------------+
+                              |                  |
+                              |  Physical Layer  |
+                              |                  |
+                              +------------------+
+                              |                  |
+                              |       N2NP       |
+                              |                  |
+                              +------------------+
+
+                                    Figure 1
+
+  The N2NP protocol is over the physical layer [Figure 1]
+  The physical layer is charged with transportation of the packet, and will be
+  likely over radio waves, with low frequencies. That implies very low bandwith,
+  and the protocol must be designed with this requirement in mind.
+  Since it does not handle transportation, the N2NP protocol can focus on the
+  Routing and the data side of a communication.
+
+
+
+
+
+
+
+
+
+
+                                                                       [Page 4]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
+2.2.  Frame
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │ Major Version │ Minor Version │           Packet Length             │
+├───────┼───────────────┴───────────────┼─────────────────────────────────────┤
+│ 2     │         Packet Length         │            Packet Type              │
+├───────┼───────────────────────────────┴─────────────────────────────────────┤
+│ 4     │                                                                     │
+├───────┤                   Source Device Identifier                          │
+│ 6     │                                                                     │
+├───────┼─────────────────────────────────────────────────────────────────────┤
+│ 8     │                                                                     │
+├───────┤                 Destination Device Identifier                       │
+│ 10    │                                                                     │
+├───────┼─────────────────────────────────────────────────────────────────────┤
+│ 12    │                            Data ...                                 │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+
+
+2.3  Device Identifaction
+
+  In order to identify a device from another, the N2NP protocol use an hashed
+  identifier, on 4 bytes. The orignal hashed content and the size of those
+  fields are not decided yet, so those are subjects to changes.
+  In a packet, the protocol shall define a source identifier (FROM) and a
+  destination identifier (TO). These fields are to be used by the neighbors
+  nodes in order to relay the packet to its final destination.
+  A routing algorithm could be used too, in order to accelerate this processus.
+
+
+
+                                                                       [Page 5]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
+2.4.  Packet Type
+
+  In order to perform multiple actions, a packet type, on 1 byte, is set in
+  the packet. This type contain a common integer that describes the type of
+  action to be performed. Read the Type * sections for more information about
+  them.
+
+2.5.  Payload
+
+  The payload of a packet (Data, in the Frame in 2.2) is filled with data.
+  This field does not have a fixed size, and its content depends on the packet
+  type. For example, a PING will not have any data.
+
+2.6.  Version & Length
+
+  The first byte of the packet is used to describe the protocol version. The
+  first 4 bits are used for the major version, the last 4 bits for the minor
+  version.
+
+                              Example version byte
+
+                          0100 .... = Major Version 4
+                          .... 0101 = Minor Version 5
+
+
+  The lentgh field describe the total length of the packet, starting from byte
+  0 of the N2NP header to last byte of the data field. It is, for now, on a
+  single byte, but that does limit the total size of a packet to 255 bytes.
+
+
+
+
+
+
+
+                                                                       [Page 6]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
+                                3.  PACKET TYPES
+
+3.1. PING
+
+  The PING packet type describe an action to test the reachability and the
+  availability of a device. This type does not have any data paired with.
+  On a PING, a device shall respond with a PONG in order to assure the orignal
+  sender of its reachability.
+  It is described with the value 0x1 (1) in the packet type field.
+
+                           Typical ping-pong exchange
+
+                          CLIENT_1 -> PING -> CLIENT_2
+                          CLIENT_1 <- PONG <- CLIENT_2
+
+3.2. PONG
+
+  The PONG packet type describe a response to a previous PING packet. It is
+  used to assure the availability of the receiver to the original sender.
+  PONG is an obligatory response to a PING packet. If a client does not respond
+  to a PING with a PONG, the original sender will assume that the receiver is
+  not reachable. This type does not have any data paired with.
+  It is described with the value 0x2 (2) in the packet type field.
+
+3.3. SERVICE
+
+  The SERVICE packet is used to describe a payload type, in order to the
+  receiver to know what type of data will follow the header. If a SERVICE type
+  is specified, data payload MUST follow the header. A data payload shall be
+  always in the following frame:
+
+
+
+
+
+                                                                       [Page 7]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
+                            Example Service Payload
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │        Service Type           │             Data Length             │
+├───────┼───────────────────────────────┴─────────────────────────────────────┤
+│ 2     │                            Data ...                                 │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+
+  The Service Type field describes a 1 byte code used to define the service
+  that it is used on this payload. Data Length describes the size of the
+  following data field. One can chain multiple SERVICE payload:
+
+                             Two services payloads
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │      First Service Type       │         First Data Length           │
+├───────┼───────────────────────────────┴─────────────────────────────────────┤
+│ 2     │                                                                     │
+├───────┤                          First Data                                 │
+│ X     │                                                                     │
+├───────┼───────────────────────────────┬─────────────────────────────────────┤
+│ X     │     Second Service Type       │         Second Data Length          │
+├───────┼───────────────────────────────┴─────────────────────────────────────┤
+│ X     │                                                                     │
+├───────┤                         Second Data                                 │
+│ X     │                                                                     │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+                                                                       [Page 8]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
+  See the SERVICES general section for more information about the content of
+  data.
+
+  The SERVICE packet type is described with 0x3 (3) in the packet type field.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                       [Page 9]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
+                                  4.  SERVICES
+
+4.1.  CHAT
+
+  The CHAT service is used to describe a chat message between two or more
+  users. It is described by the value 0x1 (1) in the service type field.
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │                         Source User ID                              │
+├───────┼─────────────────────────────────────────────────────────────────────┤
+│ 2     │                      Destination User ID                            │
+├───────┼─────────────────────────────────────────────────────────────────────┤
+│ 4     │                                                                     │
+├───────┤                       Sequence Number                               │
+│ 6     │                                                                     │
+├───────┼──────────────────────────────┬──────────────────────────────────────┤
+│ 8     │            Flags             │          Message Length              │
+├───────┼──────────────────────────────┴──────────────────────────────────────┤
+│ 10    │                           Message                                   │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+
+4.1.1.  Source and Destination User ID
+
+  The first two fields of a CHAT packet are the Source and Destination User ID.
+  These are an hash on 16 bits, describing an User identifier. The source User
+  ID must be the one of the packet sender. It is worth noting that if the flag
+  CHAN is used in flags field, the Destination ID does not describe a user
+  anymore, but a channel. See 4.1.3 section for more informations about flags.
+  One might think that this information is redondant with the devices IDs in the
+  header, but the service should be able to support multiple users on a single
+  device.
+                                                                      [Page 10]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
+4.1.2.  Sequence Number
+
+  The Sequence Number field is used to describe a sequence in the
+  communication. This information is useful to the devices, in order to track
+  a progression in a communication. On the beginning of a session, the first
+  packet sender shall set this field to 0. The mechanic behind it is the same
+  as TCP[0], the receiver shall increment this field with length it received.
+
+                          Example of a communication
+
+      CLIENT_1 ->     CHAT "Hello", sequence_number = 0        -> CLIENT_2
+      CLIENT_1 <- CHAT "Hey there !", ACK, sequence_number = 5 <- CLIENT_2
+      CLIENT_1 ->      CHAT, ACK, sequence_number = 17         -> CLIENT_2
+
+  The ACK flag is described in the 4.1.3 section.
+  If a sequence number the maximum value of a 2 byte integer, the client that
+  will overflow the sequence number shall re-beginning at 1.
+
+4.1.3.  Flags
+
+  The Flags field is used to describe multiple boolean informations
+
+                               1... .... = ACK
+                               .1.. .... = CHA
+                               ..1. .... = FRG
+                               ...1 .... = Unused
+                               .... 1... = Unused
+                               .... .1.. = Unused
+                               .... ..1. = Unused
+                               .... ...1 = Unused
+
+  The ACK flag describes an acknowledgment of data. If the ACK flag is set,
+  the sequence number field shall contain the sequence of the data acknowledged.
+
+
+                                                                      [Page 11]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
+  The CHA flag describes a special case for the Destination User ID. If the flag
+  is set, the Destination UserID field is not an UserID anymore, but rather a
+  ChannelID, based on the same principle that a UserID.
+
+  The FRG flag describes a fragmentation of data. If this flag is set, the
+  receiver shall expect one or more packets in order to complete the data.
+
+                              Fragmented exchange:
+
+               CLIENT_1 -> CHAT "Hello", FRG, seq = 0 -> CLIENT_2
+               CLIENT_1 <-     CHAT, ACK, seq = 5     <- CLIENT_2
+               CLIENT_1 ->   CHAT "World !", seq = 0  -> CLIENT_2
+               CLIENT_1 <-     CHAT, ACK, seq = 12    <- CLIENT_2
+
+    In the example above, one can see that the CLIENT_2 ACKed the data before
+    the reception of the second and final packet: It is not standard; The
+    CLIENT_1 shall not wait for an acknowledgment of data before sending more
+    fragmented packets. The exchange above could happen as:
+
+                          Another Fragmented exchange:
+
+               CLIENT_1 -> CHAT "Hello", FRG, seq = 0 -> CLIENT_2
+               CLIENT_1 ->   CHAT "World !", seq = 0  -> CLIENT_2
+               CLIENT_1 <-     CHAT, ACK, seq = 12    <- CLIENT_2
+
+  When a client has sent the final packet of his fragmented data, the FRG flag
+  must be unset; otherwise the other client will wait indefinitely for another
+  packet.
+
+4.1.4.  Message
+
+  The Message field contain the payload message sent by the user to another one.
+  It is assumed that this field is encoded with utf-8. The size of this field
+  is described in the Message Length field. If this field is set at 0, it is
+  assumed that the Message field will be empty.
+                                                                      [Page 12]
+───────────────────────────────────────────────────────────────────────────────
