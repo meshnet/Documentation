@@ -563,7 +563,7 @@ November 2017                                             Node to Node Protocol
 
                   Condition to check the validity of broadcast
 
-                 time(NULL) < issued_timestamp + (expires * 60)
+                time(NULL) < issued_timestamp + (expires * 3600)
 
 4.2.2.  Message
 
