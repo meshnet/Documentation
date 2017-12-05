@@ -1,4 +1,4 @@
-───────────────────────────────────────────────────────────────────────────────
+﻿───────────────────────────────────────────────────────────────────────────────
 
 
 
@@ -226,13 +226,13 @@ November 2017                                             Node to Node Protocol
 
 2.3  Device Identification
 
-  In order to identify a device from another, the N2NP protocol use an hashed
-  identifier, on 4 bytes. The original hashed content and the size of those
+  In order to identify a device from another, the N2NP protocol will use an hashed
+  identifier of 4 bytes. The original hashed content and the size of those
   fields are not decided yet, so those are subjects to changes.
   In a packet, the protocol shall define a source identifier (FROM) and a
-  destination identifier (TO). These fields are to be used by the neighbors
+  destination identifier (TO). These fields are to be used by the neighbors'
   nodes in order to relay the packet to its final destination.
-  A routing algorithm could be used too, in order to accelerate this process.
+  A routing algorithm could be used also, in order to accelerate this process.
 
 
 
