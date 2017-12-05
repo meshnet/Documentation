@@ -682,6 +682,8 @@ The entire routing is based on the principle that all nodes on the network
 knows every node's neighbors; Therefore, every node can determin a path for
 every packet.
 
+5.1.  PEER INFORMATIONS
+
 Peers neighbors are not the only information provided by every host on the
 network; Every host assign a score to their neighbors, based on signal strength
 and distance. This value is to be used in the heuristic algorithm in order
@@ -708,3 +710,18 @@ to evaluate the weigth of a path.
   this new information; In order to calculate a path reliably, every node on
   the network must know the neighbors of everyone: It is not intended to be
   a real-time information, but rather an indicative information.
+  In order to do that, the node must sent a PEERS packet with all the neighbors
+  information. If a peer did timeout, the main node must sent a PEER entry
+  with a score of 0 (zero). If a peer did not change score, the main node must
+  not add it in its PEERS packet.
+
+5.1.3. Update broadcast data optimization
+  Pack PEER packet to gain space.
+
+5.2. ROUTING ALGORITHM
+
+5.2.1.  General Description
+
+5.2.2. Dijkstra's algorithm
+
+5.2.3. Broadcast routing
