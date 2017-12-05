@@ -82,7 +82,16 @@ November 2017                                             Node to Node Protocol
 ───────────────────────────────────────────────────────────────────────────────
 November 2017                                             Node to Node Protocol
 
+5.  ROUTING ................................................................
 
+  5.1. PEER INFORMATIONS ...................................................
+    5.1.1. Score calculation ...............................................
+    5.1.2. Update Broadcast ................................................
+    5.1.3. Update Broadcast data optimization ..............................
+  5.2. ROUTING ALGORITHM ...................................................
+    5.2.1. General Description .............................................
+    5.2.2. Dijkstra's algorithm ............................................
+    5.2.3. Broadcast routing ...............................................
 
 
 
@@ -153,8 +162,8 @@ device driver.
 
 1.3.  References
 
-  [1] TCP RFC793 https://tools.ietf.org/html/rfc793
-
+  [1] TCP RFC793           https://tools.ietf.org/html/rfc793
+  [2] Dijkstra's_algorithm https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
 
                                                                        [Page 3]
@@ -399,7 +408,7 @@ November 2017                                             Node to Node Protocol
 │ 0     │             Score             │             Device ID               │
 ├───────┼───────────────────────────────┘                                     │
 │ 2     │                            Device ID                                │
-├───────┤                                ─────────────────────────────────────┘
+├───────┤                               ┌─────────────────────────────────────┘
 │ 4     │             Device ID         │
 └───────┴───────────────────────────────┘
 
@@ -418,29 +427,42 @@ November 2017                                             Node to Node Protocol
   Upon reception of a PEER packet, a client must update his intern routing 
   table with the informations in the PEER packet. A routing table entry consist
   of two things: The mother device ID, and a list of paired score-IDS of the
-  peers linked with the mother device.
+  peers linked with the mother device. It could be represented like that:
 
+    struct {
+        uint32_t        node_id;
 
+        struct {
+            uint8_t             score;
+            uint32_t            id;
+            struct list_head    next;
+        } neighbors;
+    };
 
+  The PEER packet is join-agnostic: A client receiving a packet must not care
+  if the sender just joined the network or just updating informations about his
+  peers. The client must update his intern routing table either way, and create
+  a new entry when it is required. A C representation of the routing table
+  could be:
 
+    typedef struct {
+        struct node_entry_s {
+            uint32_t    node_id;
 
+            struct {
+                uint8_t                 score;
+                struct node_entry_s     *id;
+                struct list_head        next;
+            };
 
+            struct list_head            next;
+        };
+    } routing_table_t;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  It is worth noting that a pointer or a 32 bits unsigned int for the ID field
+  will be the same thing, as both types takes 4 bytes in ARMv5l. Theoretically,
+  an entry will size 25 bytes in memory; In practice, GCC will align the struct
+  on an 8 byte word, therefore padding the structure up to 32 bytes.
 
 
                                                                        [Page 9]
@@ -646,3 +668,42 @@ November 2017                                             Node to Node Protocol
 
                                                                       [Page 14]
 ───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
+                                  5.  ROUTING
+
+Withing the N2NP protocol, routing is done in a special way. Since the network
+mesh is router-less, the routing protocol needs to be gateway agnostic. We got
+also low-data requirements due to physical transportation limitation. And the
+node on the network will be moving, so we need high reliability.
+
+The entire routing is based on the principle that all nodes on the network 
+knows every node's neighbors; Therefore, every node can determin a path for
+every packet.
+
+Peers neighbors are not the only information provided by every host on the
+network; Every host assign a score to their neighbors, based on signal strength
+and distance. This value is to be used in the heuristic algorithm in order
+to evaluate the weigth of a path.
+
+5.1.1.  Score calculation
+
+  A score describes the state of a node from the point of of view of another
+  node. Those two nodes must be withing physical reach for a score to be 
+  determined: it is used as weigth value for the path-finding heuristic.
+  A score is determined through the following equation:
+
+           /!\ To be determined, needs to be on one byte maximum /!\
+
+5.1.2.  Update Broadcast
+
+  This broadcast is launched when one of the following conditions are met:
+  - A new node is joining the network
+  - An existing node got a new neighbor (New client or a moving node)
+  - A peer score has changed
+
+  In all of thoses cases, the main node needs to update the whole network if
+  this new information; In order to calculate a path reliably, every node on
+  the network must know the neighbors of everyone: It is not intended to be
+  a real-time information, but rather an indicative information.
