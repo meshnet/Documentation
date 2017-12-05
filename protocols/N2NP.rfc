@@ -43,7 +43,6 @@ November 2017                                             Node to Node Protocol
 
                                TABLE OF CONTENTS
 
-
 1.  INTRODUCTION ............................................................ 3
 
   1.1 Scope of this document ................................................ 3
@@ -64,43 +63,34 @@ November 2017                                             Node to Node Protocol
   3.1 PING .................................................................. 7
   3.2 PONG .................................................................. 7
   3.3 SERVICE ............................................................... 7
-  3.4 PEERS
+  3.4 PEERS ................................................................. 9
 
-4. SERVICES .................................................................
+4. SERVICES .................................................................12
 
-  4.1 CHAT ................................................................. 10
-    4.1.1 Source and Destination User ID ................................... 10
-    4.1.2 Sequence Number .................................................. 11
-    4.1.3 Flags ............................................................ 11
-    4.1.4 Message .......................................................... 12
-  4.2 BROADCAST ............................................................ 13
-    4.2.1 Issued Timestamp & Expires ....................................... 13
-    4.2.2 Message .......................................................... 14
+  4.1 CHAT ................................................................. 12
+    4.1.1 Source and Destination User ID ................................... 12
+    4.1.2 Sequence Number .................................................. 13
+    4.1.3 Flags ............................................................ 13
+    4.1.4 Message .......................................................... 14
+  4.2 BROADCAST ............................................................ 15
+    4.2.1 Issued Timestamp & Expires ....................................... 15
+    4.2.2 Message .......................................................... 16
 
                                                                        [Page 1]
 ───────────────────────────────────────────────────────────────────────────────
 ───────────────────────────────────────────────────────────────────────────────
 November 2017                                             Node to Node Protocol
 
-5.  ROUTING ................................................................
+5.  ROUTING ................................................................ 17
 
-  5.1. PEER INFORMATIONS ...................................................
-    5.1.1. Score calculation ...............................................
-    5.1.2. Update Broadcast ................................................
-    5.1.3. Update Broadcast data optimization ..............................
-  5.2. ROUTING ALGORITHM ...................................................
-    5.2.1. General Description .............................................
-    5.2.2. Dijkstra's algorithm ............................................
-    5.2.3. Broadcast routing ...............................................
-
-
-
-
-
-
-
-
-
+  5.1. PEER INFORMATIONS ................................................... 17
+    5.1.1. Score calculation ............................................... 17
+    5.1.2. Update Broadcast ................................................ 18
+    5.1.3. Update Broadcast data optimization .............................. 18
+  5.2. ROUTING ALGORITHM ................................................... 19
+    5.2.1. General Description ............................................. 19
+    5.2.2. Dijkstra's algorithm ............................................ 20
+    5.2.3. Broadcast routing ............................................... 20
 
 
 
@@ -400,6 +390,17 @@ November 2017                                             Node to Node Protocol
   The Peer size field does describe the number of couples score-ID
   present in the packet. A score - device ID pair is a simple data structure:
 
+
+
+
+
+
+
+                                                                       [Page 9]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
 ┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Octet ┃               0               ┃                 1                   ┃
 ┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
@@ -428,6 +429,17 @@ November 2017                                             Node to Node Protocol
   table with the informations in the PEER packet. A routing table entry consist
   of two things: The mother device ID, and a list of paired score-IDS of the
   peers linked with the mother device. It could be represented like that:
+
+
+
+
+
+
+
+                                                                      [Page 10]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
 
     struct {
         uint32_t        node_id;
@@ -464,8 +476,7 @@ November 2017                                             Node to Node Protocol
   an entry will size 25 bytes in memory; In practice, GCC will align the struct
   on an 8 byte word, therefore padding the structure up to 32 bytes.
 
-
-                                                                       [Page 9]
+                                                                      [Page 11]
 ───────────────────────────────────────────────────────────────────────────────
 ───────────────────────────────────────────────────────────────────────────────
 November 2017                                             Node to Node Protocol
@@ -505,7 +516,7 @@ November 2017                                             Node to Node Protocol
   One might think that this information is redundant with the devices IDs in
   the header, but the service should be able to support multiple users on a
   single device.
-                                                                      [Page 10]
+                                                                      [Page 12]
 ───────────────────────────────────────────────────────────────────────────────
 ───────────────────────────────────────────────────────────────────────────────
 November 2017                                             Node to Node Protocol
@@ -546,7 +557,7 @@ November 2017                                             Node to Node Protocol
   acknowledged.
 
 
-                                                                      [Page 11]
+                                                                      [Page 13]
 ───────────────────────────────────────────────────────────────────────────────
 ───────────────────────────────────────────────────────────────────────────────
 November 2017                                             Node to Node Protocol
@@ -586,7 +597,7 @@ November 2017                                             Node to Node Protocol
   one. It is assumed that this field is encoded with utf-8. The size of this
   field is described in the Message Length field. If this field is set at 0, it
   is assumed that the Message field will be empty.
-                                                                      [Page 12]
+                                                                      [Page 14]
 ───────────────────────────────────────────────────────────────────────────────
 ───────────────────────────────────────────────────────────────────────────────
 November 2017                                             Node to Node Protocol
@@ -625,7 +636,7 @@ November 2017                                             Node to Node Protocol
   starting from the Issued timestamp. Client should be doing the following
   addition in order to check the validity of a broadcast
 
-                                                                      [Page 13]
+                                                                      [Page 15]
 ───────────────────────────────────────────────────────────────────────────────
 ───────────────────────────────────────────────────────────────────────────────
 November 2017                                             Node to Node Protocol
@@ -666,7 +677,7 @@ November 2017                                             Node to Node Protocol
 
 
 
-                                                                      [Page 14]
+                                                                      [Page 16]
 ───────────────────────────────────────────────────────────────────────────────
 ───────────────────────────────────────────────────────────────────────────────
 November 2017                                             Node to Node Protocol
@@ -698,6 +709,19 @@ to evaluate the weigth of a path.
 
            /!\ To be determined, needs to be on one byte maximum /!\
 
+
+
+
+
+
+
+
+
+                                                                    [Page 17]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
 5.1.2.  Update Broadcast
 
   This broadcast is launched when one of the following conditions are met:
@@ -727,6 +751,16 @@ to evaluate the weigth of a path.
   A client, receiving broadcast update data from multiple clients in one packet
   must deduce the number of nodes implicated by looking at the total length
   in the N2NP header.
+
+
+
+
+
+
+                                                                     [Page 18]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
 
 5.2. ROUTING ALGORITHM
 
@@ -761,6 +795,13 @@ Node A         \ Node G ----- /    |                  \-- Node H         Node Z
                                     \ Node I                  \  Node J /
 
 
+
+
+                                                                     [Page 19]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
   Let's take the above schema: In this example, the node A still wants to reach
   the node Z. In order to do that, the node A must determin the best path from
   his direct peer; In this case it's quite simple the node A only has one peer.
@@ -792,6 +833,15 @@ Node A         \ Node G ----- /    |                  \-- Node H         Node Z
   networks shall receive the packet. Therefore, the routing algorithm cannot be
   used in this case. A flood routing algorithm is to be used.
 
+
+
+
+
+                                                                     [Page 20]
+───────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────
+November 2017                                             Node to Node Protocol
+
                              Simple 4 nodes network
 
                                      Node A
@@ -812,3 +862,20 @@ Node A         \ Node G ----- /    |                  \-- Node H         Node Z
   this packet has already been relayed, and simply drop it.
   With this method, we keep simplicity through routing, without much data
   overhead and broadcast replay problems.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                     [Page 21]
+───────────────────────────────────────────────────────────────────────────────
