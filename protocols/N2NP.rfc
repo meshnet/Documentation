@@ -781,4 +781,34 @@ Node A         \ Node G ----- /    |                  \-- Node H         Node Z
 
 5.2.2. Dijkstra's algorithm
 
+  In order to compute the best path for a packet, a node must use the 
+  Dijkstra's algorithm[1]. Instead of using distance as a sole weigth
+  parameter, the score of the nodes is to be used. See the relevant sections
+  for score calculations.
+
 5.2.3. Broadcast routing
+
+  By nature, broadcast packet do not have a destination: All the members of the
+  networks shall receive the packet. Therefore, the routing algorithm cannot be
+  used in this case. A flood routing algorithm is to be used.
+
+                             Simple 4 nodes network
+
+                                     Node A
+                                    /     \
+                               Node B     Node D
+                                    \     /
+                                     Node C
+
+  Lets take the above schema: In this example, the node A wants to broadcast
+  a packet tot the network: First, it will send it to his direct neighbors:
+  B and D. Before sending, the node must compute a checksum of the full packet,
+  starting at the N2NP header, and store it. The node D, upon reception of the 
+  packet, and before userland treatment, must do the same: Compute a checksum,
+  and send the packet to his direct neighbors, A and C. C has never seen the
+  packet before: Therefore it will compute and relay it. But the node A did
+  already seen the packet (Since he's the one who sent it). So, upon reception,
+  A will compute the checksum, check with his internal storage, see that
+  this packet has already been relayed, and simply drop it.
+  With this method, we keep simplicity through routing, without much data
+  overhead and broadcast replay problems.
