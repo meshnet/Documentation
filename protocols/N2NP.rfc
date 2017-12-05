@@ -64,6 +64,7 @@ November 2017                                             Node to Node Protocol
   3.1 PING .................................................................. 7
   3.2 PONG .................................................................. 7
   3.3 SERVICE ............................................................... 7
+  3.4 PEERS
 
 4. SERVICES .................................................................
 
@@ -367,11 +368,57 @@ November 2017                                             Node to Node Protocol
   The SERVICE packet type is described with 0x3 (3) in the packet type field.
 
 
+3.4. PEERS
+
+ The PEERS packet type describe the state of a node with its neighbors. It can
+ be used for different purposes, when a client is joining the network, to 
+ update the score of a peer or when a node loose a peer. It is described with
+ the value 0x4 (4) in the packet type field.
+
+                              PEERS packet header
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │           Peer size           │                Data                 │
+├───────┼───────────────────────────────┘                                     │
+│ 2     │                            Data ...                                 │
+└───────┴─────────────────────────────────────────────────────────────────────┘
 
 
+  The Peer size field does describe the number of couples score-ID
+  present in the packet. A score - device ID pair is a simple data structure:
 
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │             Score             │             Device ID               │
+├───────┼───────────────────────────────┘                                     │
+│ 2     │                            Device ID                                │
+├───────┤                                ─────────────────────────────────────┘
+│ 4     │             Device ID         │
+└───────┴───────────────────────────────┘
 
+  The Score field describe the current score of the Device ID node, perceived
+  by the source node; It is used to choose a best path when routing is needed.
+  The Device ID describes the peer device ID, on 4 bytes.
 
+  Those packets are broadcast by nature; If a client should receive a PEERS
+  packet, the Destination Device Identifier in the N2NP header shall be set at
+  0. Upon joining, a new node wanting to announce itself on the network must
+  use a PEER packet: It announces the current peers of the node, and the score.
+  For peer list and score calculation, see the relevant section. It is also
+  used when a node want to announce an update on his peers: A peer has been 
+  lost, a peer score has changed, or a new peer has arrived.
+
+  Upon reception of a PEER packet, a client must update his intern routing 
+  table with the informations in the PEER packet. A routing table entry consist
+  of two things: The mother device ID, and a list of paired score-IDS of the
+  peers linked with the mother device.
 
 
 
