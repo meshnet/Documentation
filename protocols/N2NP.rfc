@@ -701,6 +701,7 @@ to evaluate the weigth of a path.
   This broadcast is launched when one of the following conditions are met:
   - A new node is joining the network
   - An existing node got a new neighbor (New client or a moving node)
+  - A node has timeout
   - A peer score has changed
 
   In all of thoses cases, the main node needs to update the whole network if
