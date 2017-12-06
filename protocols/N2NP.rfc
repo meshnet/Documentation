@@ -420,10 +420,10 @@ November 2017                                             Node to Node Protocol
   Those packets are broadcast by nature; if a client happens to receive a PEERS
   packet, the Destination Device Identifier in the N2NP header shall be set at
   0. Upon joining, a new node wanting to announce itself on the network must
-  use a PEER packet: it announces the current peers of the node, and their score.
-  For peer list and score calculation, see the relevant section. It is also
-  used when a node want to announce an update on his peers: a peer has been
-  lost, a peer score has changed, or a new peer has arrived.
+  use a PEER packet: it announces the current peers of the node, and their
+  score. For peer list and score calculation, see the relevant section. It is
+  also used when a node want to announce an update on his peers: a peer has
+  been lost, a peer score has changed, or a new peer has arrived.
 
   Upon reception of a PEER packet, a client must update his intern routing
   table with the information in the PEER packet. A routing table entry consist
@@ -452,10 +452,10 @@ November 2017                                             Node to Node Protocol
     };
 
   The PEER packet is join-agnostic: a client receiving a packet must not care
-  if the sender just joined the network or is just updating information about his
-  peers. The client must update his intern routing table either way, and create
-  a new entry when it is required. A C representation of the routing table
-  could be:
+  if the sender just joined the network or is just updating information about 
+  his peers. The client must update his intern routing table either way, and 
+  create a new entry when it is required. A C representation of the routing 
+  table could be:
 
     typedef struct {
         struct node_entry_s {
@@ -569,7 +569,7 @@ November 2017                                             Node to Node Protocol
   The FRG flag describes a fragmentation of data. If this flag is set, the
   receiver shall expect one or more packets in order to complete the data.
 
-                        Incorrect fragmented exchange:                           < Oups, fix centering
+                         Incorrect fragmented exchange:
 
                CLIENT_1 -> CHAT "Hello", FRG, seq = 0 -> CLIENT_2
                CLIENT_1 <-     CHAT, ACK, seq = 5     <- CLIENT_2
@@ -581,7 +581,7 @@ November 2017                                             Node to Node Protocol
     CLIENT_1 shall not wait for an acknowledgment of data before sending more
     fragmented packets. The exchange above should have happened like this:
 
-                          Correct fragmented exchange:                           < Yep, again
+                          Correct fragmented exchange:
 
                CLIENT_1 -> CHAT "Hello", FRG, seq = 0 -> CLIENT_2
                CLIENT_1 ->   CHAT "World !", seq = 0  -> CLIENT_2
@@ -676,7 +676,6 @@ November 2017                                             Node to Node Protocol
 
 
 
-
                                                                       [Page 16]
 ───────────────────────────────────────────────────────────────────────────────
 ───────────────────────────────────────────────────────────────────────────────
@@ -696,9 +695,9 @@ every packet.
 5.1.  PEER INFORMATION
 
   Peer's neighbors are not the only information provided by every host on the
-  network; every host assign a score to their neighbors, based on signal strength
-  and distance. This value is to be used in the heuristic algorithm in order
-  to evaluate the weight of a path.
+  network; every host assign a score to their neighbors, based on signal
+  strength and distance. This value is to be used in the heuristic algorithm in
+  order to evaluate the weight of a path.
 
 5.1.1.  Score calculation
 
@@ -741,9 +740,9 @@ November 2017                                             Node to Node Protocol
 
 5.1.3. Update broadcast data optimization
 
-  In order to optimize usage of data bandwidth, broadcast peer update data must be packed
-  whenever possible. If a node B is to retransmit the update data of the
-  node A, and the node B itself has broadcast data in the output pipe, the
+  In order to optimize usage of data bandwidth, broadcast peer update data must
+  be packed whenever possible. If a node B is to retransmit the update data of
+  the node A, and the node B itself has broadcast data in the output pipe, the
   B node must pack the node A information with it's information, and send one
   and only packet to be relayed by its peers. Of course, this packed data
   length should not exceed the packet maximum size, otherwise the first packet
@@ -778,8 +777,8 @@ information.
   best, on every hop. Let's say we have node A wanting to send a packet to
   node Z; the simple scenario is that those two nodes are physically next to
   each other: therefore, no routing is needed. But, if those two nodes are not
-  directly connected to each other, node A must determine the best route to reach
-  node Z. In order to do that, and with all the information about all the
+  directly connected to each other, node A must determine the best route to
+  reach node Z. In order to do that, and with all the information about all the
   nodes on the network (See PEERS), node A must run an heuristic algorithm
   on all his peers node (physically connected) with the score of each node as
   weight. In order not to loose time in the process, the depth used for the
@@ -805,17 +804,17 @@ November 2017                                             Node to Node Protocol
   Let's take the above schema: node A still wants to reach node Z.
   In order to do that, node A must determine the best path from
   his direct peer; in this case it's quite simple; node A only has one peer.
-  Node A sends the packet to node B, and it's now the turn of node B to determine
-  the best path from his peer. Here, we got two peers nodes: C and G. With the
-  score of both it's direct peers, and all the ones beyond these, node B
-  must now determine the best path to route this packet. It is important to
+  Node A sends the packet to node B, and it's now the turn of node B to
+  determine the best path from his peer. Here, we got two peers nodes: C and G.
+  With the score of both it's direct peers, and all the ones beyond these, node
+  B must now determine the best path to route this packet. It is important to
   note that node B's intern routing table, that describes all the scores of
-  everyone on the network, does not need to be updated in real time: the node can
-  determine a good-enough path to the next hop with it's data. Let's say, for the
-  sake of the example, that node C has a score of 40, and G, a score of 55.
-  Since both C and G share the same exit node, D, their exit score will be the
-  same. So the node B must compare the score of C and G in order to route the
-  packet properly. In this example, G got a bigger score than C, so node B
+  everyone on the network, does not need to be updated in real time: the node
+  can determine a good-enough path to the next hop with it's data. Let's say,
+  for the sake of the example, that node C has a score of 40, and G, a score of
+  55. Since both C and G share the same exit node, D, their exit score will be
+  the same. So the node B must compare the score of C and G in order to route
+  the packet properly. In this example, G got a bigger score than C, so node B
   will route the packet to G. Node G, upon reception, will do the same
   algorithm in order to route the packet to the next node, and the next node
   will do the same, and so on to the final destination node.
@@ -829,9 +828,9 @@ November 2017                                             Node to Node Protocol
 
 5.2.3. Broadcast routing
 
-  By nature, broadcast packets do not have a destination: All the members of the
-  networks shall receive the packet. Therefore, the routing algorithm cannot be
-  used in this case. A flood routing algorithm shall be used.
+  By nature, broadcast packets do not have a destination: All the members of
+  the networks shall receive the packet. Therefore, the routing algorithm
+  cannot be used in this case. A flood routing algorithm shall be used.
 
 
 
@@ -854,12 +853,12 @@ November 2017                                             Node to Node Protocol
   a packet to the network: first, it will send it to his direct neighbors:
   B and D. Before sending, the node must compute a checksum of the full packet,
   starting at the N2NP header, and store it. The node D, upon reception of the
-  packet, and before treatment in userland, must do the same: compute a checksum,
-  and send the packet to his direct neighbors, A and C. C has never seen the
-  packet before: therefore it will compute and relay it. But the node A has
-  already seen the packet (Since he's the one who sent it). So, upon reception,
-  A will compute the checksum, check with his internal storage, see that
-  this packet has already been relayed, and simply drop it.
+  packet, and before treatment in userland, must do the same: compute a
+  checksum, and send the packet to his direct neighbors, A and C. C has never
+  seen the packet before: therefore it will compute and relay it. But the node
+  A has already seen the packet (Since he's the one who sent it). So, upon
+  reception, A will compute the checksum, check with his internal storage, see
+  that this packet has already been relayed, and simply drop it.
   With this method, we keep simplicity through routing, without much data
   overhead and broadcast replay problems.
 
