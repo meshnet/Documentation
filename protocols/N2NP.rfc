@@ -161,7 +161,7 @@ device driver.
 ───────────────────────────────────────────────────────────────────────────────
 November 2017                                             Node to Node Protocol
 
-                            2.  GENERAL DESCRIPTION 
+                            2.  GENERAL DESCRIPTION
 
 2.1.  Protocol Description
 
@@ -370,7 +370,7 @@ November 2017                                             Node to Node Protocol
 3.4. PEERS
 
  The PEERS packet type describe the state of a node with its neighbors. It can
- be used for different purposes, when a client is joining the network, to 
+ be used for different purposes, when a client is joining the network, to
  update the score of a peer or when a node loose a peer. It is described with
  the value 0x4 (4) in the packet type field.
 
@@ -422,7 +422,7 @@ November 2017                                             Node to Node Protocol
   0. Upon joining, a new node wanting to announce itself on the network must
   use a PEER packet: it announces the current peers of the node, and their score.
   For peer list and score calculation, see the relevant section. It is also
-  used when a node want to announce an update on his peers: a peer has been 
+  used when a node want to announce an update on his peers: a peer has been
   lost, a peer score has changed, or a new peer has arrived.
 
   Upon reception of a PEER packet, a client must update his intern routing
@@ -853,7 +853,7 @@ November 2017                                             Node to Node Protocol
   Lets take the above schema: in this example, node A wants to broadcast
   a packet to the network: first, it will send it to his direct neighbors:
   B and D. Before sending, the node must compute a checksum of the full packet,
-  starting at the N2NP header, and store it. The node D, upon reception of the 
+  starting at the N2NP header, and store it. The node D, upon reception of the
   packet, and before treatment in userland, must do the same: compute a checksum,
   and send the packet to his direct neighbors, A and C. C has never seen the
   packet before: therefore it will compute and relay it. But the node A has
