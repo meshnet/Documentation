@@ -180,11 +180,11 @@ November 2017                                             Node to Node Protocol
 
                                     Figure 1
 
-  The N2NP protocol is over the physical layer [Figure 1]
+  The N2NP is over the physical layer [Figure 1]
   The physical layer is charged with transportation of the packet, and will be
   likely over radio waves, with low frequencies. That implies very low
   bandwidth, and the protocol must be designed with this requirement in mind.
-  Since it does not handle transportation, the N2NP protocol can focus on the
+  Since it does not handle transportation, the N2NP can focus on the
   Routing and the data side of a communication.
 
 
@@ -226,7 +226,7 @@ November 2017                                             Node to Node Protocol
 
 2.3  Device Identification
 
-  In order to identify a device from another, the N2NP protocol use an hashed
+  In order to identify a device from another, the N2NP use an hashed
   identifier, on 4 bytes. The original hashed content and the size of those
   fields are not decided yet, so those are subjects to changes.
   In a packet, the protocol shall define a source identifier (FROM) and a
