@@ -285,7 +285,7 @@ November 2017                                             Node to Node Protocol
 
 3.1. PING
 
-  The PING packet type describe an action to test the reachability and the
+  The PING packet type describes an action to test the reachability and the
   availability of a device. This type does not have any data paired with.
   On a PING, a device shall respond with a PONG in order to assure the original
   sender of its reachability.
@@ -298,7 +298,7 @@ November 2017                                             Node to Node Protocol
 
 3.2. PONG
 
-  The PONG packet type describe a response to a previous PING packet. It is
+  The PONG packet type describes a response to a previous PING packet. It is
   used to assure the availability of the receiver to the original sender.
   PONG is an obligatory response to a PING packet. If a client does not respond
   to a PING with a PONG, the original sender will assume that the receiver is
@@ -509,7 +509,7 @@ November 2017                                             Node to Node Protocol
 4.1.1.  Source and Destination User ID
 
   The first two fields of a CHAT packet are the Source and Destination User ID.
-  These are an hash on 16 bits, describing an User identifier. The source User
+  These are a hash on 16 bits, describing an User identifier. The source User
   ID must be the one of the packet sender. It is worth noting that if the flag
   CHAN is used in flags field, the Destination ID does not describe a user
   anymore, but a channel. See 4.1.3 section for more information about flags.
@@ -630,7 +630,7 @@ November 2017                                             Node to Node Protocol
 
   The first four bytes describes a Unix EPOCH timestamp. This timestamp is the
   time at which the broadcast shall be delivered (client-side, not protocol
-  side). It can be in the future, the firmware should handles the proper
+  side). It can be in the future, the firmware should handle the proper
   delivery of the broadcast to the differents applications.
   The Expires field describes the number of hours that the broadcast is valid
   starting from the Issued timestamp. Client should be doing the following
@@ -685,12 +685,12 @@ November 2017                                             Node to Node Protocol
                                   5.  ROUTING
 
 Withing the N2NP protocol, routing is done in a special way. Since the network
-mesh is router-less, the routing protocol needs to be gateway agnostic. We got
-also low-data requirements due to physical transportation limitation. And the
+mesh is router-less, the routing protocol needs to be gateway agnostic. We 
+also have low-data requirements due to physical transportation limitation. And the
 node on the network will be moving, so we need high reliability.
 
 The entire routing is based on the principle that all nodes on the network 
-knows every node's neighbors; Therefore, every node can determin a path for
+knows every node's neighbors; Therefore, every node can determine a path for
 every packet.
 
 5.1.  PEER INFORMATIONS
@@ -698,13 +698,13 @@ every packet.
 Peers neighbors are not the only information provided by every host on the
 network; Every host assign a score to their neighbors, based on signal strength
 and distance. This value is to be used in the heuristic algorithm in order
-to evaluate the weigth of a path.
+to evaluate the weight of a path.
 
 5.1.1.  Score calculation
 
   A score describes the state of a node from the point of of view of another
   node. Those two nodes must be withing physical reach for a score to be 
-  determined: it is used as weigth value for the path-finding heuristic.
+  determined: it is used as weight value for the path-finding heuristic.
   A score is determined through the following equation / heuristic:
 
            /!\ To be determined, needs to be on one byte maximum /!\
@@ -727,7 +727,7 @@ November 2017                                             Node to Node Protocol
   This broadcast is launched when one of the following conditions are met:
   - A new node is joining the network
   - An existing node got a new neighbor (New client or a moving node)
-  - A node has timeout
+  - A node has timed out
   - A peer score has changed
 
   In all of thoses cases, the main node needs to update the whole network if
@@ -741,7 +741,7 @@ November 2017                                             Node to Node Protocol
 
 5.1.3. Update broadcast data optimization
 
-  In order to gain data bandwidth, broadcast peer update data must be packed
+  In order to optimize usage of data bandwidth, broadcast peer update data must be packed
   whenever its possible. If a node B is to retransmit the update data of the
   node A, and the node B itself has broadcast data in the output pipe, the 
   B node must pack the node A information with his information, and send one
@@ -774,16 +774,16 @@ information.
 5.2.1.  General Description
 
   The concept of this routing algorithm is quite simple: Every node bound to
-  route a packet from a node A to a node B must determin which route is the 
-  best, on every hop. Let's say we got a node A wanting to send a packet to 
+  route a packet from a node A to a node B must determine which route is the 
+  best, on every hop. Let's say we have a node A wanting to send a packet to 
   node Z; The simple scenario is that those two nodes are physically next to
   each other: Therefore, no routing is needed. But, if those two nodes are not
-  connected between each other, node A must determin the best route to reach
-  node Z. In order to do that, and with all the informations about all the
+  connected between each other, node A must determine the best route to reach
+  node Z. In order to do that, and with all the information about all the
   nodes on the network (See PEERS), the node A must run an heuristic algorithm
   on all his peers node (physically connected) with the score of each node as
-  weigth. In order not to loose time in the process, the depth used for the
-  algorithm should be minimal: The node A do not need to determin an exact 
+  weight. In order not to loose time in the process, the depth used for the
+  algorithm should be minimal: The node A do not need to determine an exact 
   perfect path all the way to node Z, but rather choose between his direct
   peers, the one that will be more suited to route this packet.
 
@@ -803,15 +803,15 @@ Node A         \ Node G ----- /    |                  \-- Node H         Node Z
 November 2017                                             Node to Node Protocol
 
   Let's take the above schema: In this example, the node A still wants to reach
-  the node Z. In order to do that, the node A must determin the best path from
+  the node Z. In order to do that, the node A must determine the best path from
   his direct peer; In this case it's quite simple the node A only has one peer.
-  Node A sents the packet to Node B, and it's the turn of Node B to determin
+  Node A sents the packet to Node B, and it's the turn of Node B to determine
   the best path from his peer. Here, we got two peers nodes: C and G. With the
   both score of those direct peers, and all the ones beyond those ones, node B
-  must know determin the best path to route this packet. It is important to 
+  must know determine the best path to route this packet. It is important to 
   note that the node B intern routing table, that describes all the scores of
   everyone on the network, don't need to be updated in real time: The node can
-  determin a good-enough-path to next peer with his data. Let's say, for the 
+  determine a good-enough-path to next peer with his data. Let's say, for the 
   sake of the example, that node C has a score of 40, and G, a score of 55.
   Since both C and G share the same exit node, D, their exit score will be the
   same. So the node B must compare the score of C and G in order to route the
@@ -823,13 +823,13 @@ November 2017                                             Node to Node Protocol
 5.2.2. Dijkstra's algorithm
 
   In order to compute the best path for a packet, a node must use the 
-  Dijkstra's algorithm[1]. Instead of using distance as a sole weigth
+  Dijkstra's algorithm[1]. Instead of using distance as a sole weight
   parameter, the score of the nodes is to be used. See the relevant sections
   for score calculations.
 
 5.2.3. Broadcast routing
 
-  By nature, broadcast packet do not have a destination: All the members of the
+  By nature, broadcast packets do not have a destination: All the members of the
   networks shall receive the packet. Therefore, the routing algorithm cannot be
   used in this case. A flood routing algorithm is to be used.
 
@@ -851,12 +851,12 @@ November 2017                                             Node to Node Protocol
                                      Node C
 
   Lets take the above schema: In this example, the node A wants to broadcast
-  a packet tot the network: First, it will send it to his direct neighbors:
+  a packet to the network: First, it will send it to his direct neighbors:
   B and D. Before sending, the node must compute a checksum of the full packet,
   starting at the N2NP header, and store it. The node D, upon reception of the 
   packet, and before userland treatment, must do the same: Compute a checksum,
   and send the packet to his direct neighbors, A and C. C has never seen the
-  packet before: Therefore it will compute and relay it. But the node A did
+  packet before: Therefore it will compute and relay it. But the node A has
   already seen the packet (Since he's the one who sent it). So, upon reception,
   A will compute the checksum, check with his internal storage, see that
   this packet has already been relayed, and simply drop it.
