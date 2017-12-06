@@ -244,7 +244,7 @@ November 2017                                             Node to Node Protocol
 2.4.  Packet Type
 
   In order to perform multiple actions, a packet type, on 1 byte, is set in
-  the packet. This type contain a common integer that describes the type of
+  the packet. This field contain a common integer that describes the type of
   action to be performed. Read the Type * sections for more information about
   them.
 
@@ -417,7 +417,7 @@ November 2017                                             Node to Node Protocol
   by the source node; It is used to choose a best path when routing is needed.
   The Device ID describes the peer device ID, on 4 bytes.
 
-  Those packets are broadcast by nature; if a client should receive a PEERS
+  Those packets are broadcast by nature; if a client happens to receive a PEERS
   packet, the Destination Device Identifier in the N2NP header shall be set at
   0. Upon joining, a new node wanting to announce itself on the network must
   use a PEER packet: it announces the current peers of the node, and their score.
@@ -546,11 +546,11 @@ November 2017                                             Node to Node Protocol
                                1... .... = ACK
                                .1.. .... = CHA
                                ..1. .... = FRG
-                               ...1 .... = Unused
-                               .... 1... = Unused
-                               .... .1.. = Unused
-                               .... ..1. = Unused
-                               .... ...1 = Unused
+                               ...1 .... = Reserved
+                               .... 1... = Reserved
+                               .... .1.. = Reserved
+                               .... ..1. = Reserved
+                               .... ...1 = Reserved
 
   The ACK flag describes an acknowledgment of data. If the ACK flag is set,
   the sequence number field shall contain the sequence of the data
@@ -569,7 +569,7 @@ November 2017                                             Node to Node Protocol
   The FRG flag describes a fragmentation of data. If this flag is set, the
   receiver shall expect one or more packets in order to complete the data.
 
-                              Fragmented exchange:
+                        Incorrect fragmented exchange:                           < Oups, fix centering
 
                CLIENT_1 -> CHAT "Hello", FRG, seq = 0 -> CLIENT_2
                CLIENT_1 <-     CHAT, ACK, seq = 5     <- CLIENT_2
@@ -581,7 +581,7 @@ November 2017                                             Node to Node Protocol
     CLIENT_1 shall not wait for an acknowledgment of data before sending more
     fragmented packets. The exchange above should have happened like this:
 
-                          Another Fragmented exchange:
+                          Correct fragmented exchange:                           < Yep, again
 
                CLIENT_1 -> CHAT "Hello", FRG, seq = 0 -> CLIENT_2
                CLIENT_1 ->   CHAT "World !", seq = 0  -> CLIENT_2
@@ -687,7 +687,7 @@ November 2017                                             Node to Node Protocol
 Within the N2NP protocol, routing is done in a special way. Since the network
 mesh is router-less, the routing protocol needs to be gateway agnostic. We
 also have low-data requirements due to the physical transportation limitation.
-Also, as the node on the network will be moving, high reliability is a must.
+Also, as a node on the network may be moving, high reliability is a must.
 
 The entire routing is based on the principle that all nodes on the network
 knows every node's neighbors; therefore, every node can determine a path for
