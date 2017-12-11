@@ -129,6 +129,8 @@ likely over radio waves, with low frequencies. That implies very low
 bandwidth, and the protocol must be designed with this requirement in mind.
 Since it does not handle transportation, the N2NP can focus on the
 Routing and the data side of a communication.
+It is assumed that if a packet is not compliant with this specification, a
+client should drop it.
 
 .NH 2
 Frame
@@ -531,12 +533,12 @@ Issued Timestamp & Expires
 .LP
 .in 2
 The first four bytes describes a Unix EPOCH timestamp. This timestamp is the
-time at which the broadcast shall be delivered (client-side, not protocol
-side). It can be in the future, the firmware should handle the proper
-delivery of the broadcast to the different applications.
-The Expires field describes the number of hours that the broadcast is valid
-starting from the Issued timestamp. Client should be doing the following
-addition in order to check the validity of a broadcast
+This timestamp is the time at which the original author sent the broadcast.
+It can't be in the future, if such a thing would happen, a client must drop
+the broadcast, and not relay it. The Expires field describes the number of
+hours that the broadcast is valid starting from the Issued timestamp. Client
+should be doing the following addition in order to check the validity of a
+broadcast
 
                 Condition to check the validity of broadcast
 
@@ -679,7 +681,7 @@ the scores of everyone on the network, does not need to be updated in real
 time: the node can determine a good-enough path to the next hop with it's data. 
 
 Let's say, for the sake of the example, that node C has a score of 40, and G, a 
-score of 55. Since both C and G share the same exit node, D, their exit score 
+score of 55. Since both C and G share the same output node, D, their exit score
 will be the same. So the node B must compare the score of C and G in order to 
 route the packet properly.
 
