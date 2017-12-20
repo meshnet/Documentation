@@ -1,5 +1,9 @@
 # Documentation
 
+Documentation for the meshnet project.
+
+See ./protocols/N2NP.rfc to review the current protocol and submit comments for review.
+
 ### Managers:
 
 - Louis *slack/@Louis*    [*github/Ne02ptzero*](https://github.com/Ne02ptzero)
