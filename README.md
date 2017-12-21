@@ -1,8 +1,8 @@
 # Documentation
 
-Documentation for the meshnet project.
+Documentation for the ~~meshnet~~ project.
 
-See ./protocols/N2NP.rfc to review the current protocol and submit comments for review.
+See ./protocols/N2NP.rfc to review the current protocol proposition and submit comments your comments in PR #2
 
 ### Managers:
 
