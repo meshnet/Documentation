@@ -1,6 +1,6 @@
 # Documentation
 
-Documentation for the [redacted]  project.
+Documentation for the meshnet project.
 
 See ./protocols/N2NP.rfc in branch work/louis/routing to review the current protocol proposition and submit comments your comments in PR #2
 
