@@ -4,9 +4,9 @@
 
 ## Protocols
 
-The current protocol [_WIP_] is `./protocols/N2NP.rfc`.
+The current protocol [_UNFINISHED_] is `./protocols/N2NP.rfc`.
 
-**Working branch:** `work/louis/routing`. _Submit your comments in PR #2._
+**Current working branch:** `work/louis/routing`. _Submit your comments in PR #2._
 
 ## Maintainers
 
