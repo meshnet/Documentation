@@ -1,5 +1,7 @@
 # Visual Studio Code workspace file
 *.code-workspace
+
+# User-generated files
 *.html
 *.term
 *.txt
