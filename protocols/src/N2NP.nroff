@@ -11,7 +11,7 @@
 .nf
 
 .R1
-database protocols/refer
+database src/refer
 .R2
 
 .TL
