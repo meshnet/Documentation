@@ -1,4 +1,6 @@
-# Known make errors
+# Documentation/Protocols
+
+## Known make errors
 
 | Symptom | Fix | Notes |
 | ------- | --- | ----- |
