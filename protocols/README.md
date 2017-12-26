@@ -1,6 +1,6 @@
 # Documentation/Protocols
 
-## Known make errors
+## Known `make` errors
 
 | Symptom | Fix | Notes |
 | ------- | --- | ----- |
