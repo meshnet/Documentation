@@ -4,9 +4,9 @@
 
 ## Protocols
 
-The current protocol [_UNFINISHED_] is `./protocols/N2NP.rfc`.
+The current N2NP [_UNFINISHED_] is in the `/protocols` folder. Read `/protocols/README.md` for more info.
 
-**Current working branch:** `work/louis/routing`. _Submit your comments in PR #2._
+**Current working branch:** none. _Submit your comments as issues._
 
 ## Maintainers
 
