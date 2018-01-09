@@ -28,7 +28,7 @@ protocol between node devices (hosts) in packet-switched embedded computer
 communication networks over radio waves.
 
 This document describes the function to be performed by the Node to Node
-Protocol, the programs that implements it, and its interface through a kernel
+Protocol, the programs that implement it, and its interface through a kernel
 device driver.
 .AE
 
@@ -84,7 +84,7 @@ Scope of this document
 .LP
 .in 2
 N2NP is a transport and applicative layer for the MeshNet project. It provides
-communication between two nodes, through radio signals. The physical layer
+communication between two nodes through radio signals. The physical layer
 (radio) is not yet defined as of this day, and it's not in the scope of this
 document. This document shall describe the internal mechanisms of the protocol,
 and its integration within the MeshNet project.
@@ -125,7 +125,7 @@ Protocol Description
 
 The N2NP is over the physical layer [Figure 1]
 The physical layer is charged with transportation of the packet, and will be
-likely over radio waves, with low frequencies. That implies very low
+likely over radio waves with low frequencies. That implies very low
 bandwidth, and the protocol must be designed with this requirement in mind.
 Since it does not handle transportation, the N2NP can focus on the
 Routing and the data side of a communication.
@@ -137,7 +137,7 @@ Frame
 .LP
 ┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Octet ┃               0               ┃                 1                   ┃
-┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
 ┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
 ┡━━━━━━━╇━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
 │ 0     │ Major Version │ Minor Version │           Packet Length             │
@@ -159,20 +159,20 @@ Frame
 Device Identification
 .LP
 .in 2
-In order to identify a device from an other one, the N2NP use an
-hashed identifier, on 4 bytes. The original hashed content and the size of
-those fields are not decided yet, so those are subjects to changes.
+In order to identify a device uniquely the N2NP uses a hashed identifier with
+a length of 4 bytes. The original hashed content and the size of those fields
+are not finally decided yet, so those are subjects to changes.
 In a packet, the protocol shall define a source identifier (FROM) and a
-destination identifier (TO). These fields are to be used by the neighbor
+destination identifier (TO). These fields are to be used by the neighboring
 nodes in order to relay the packet to its final destination.
-A routing algorithm could be used too, in order to accelerate this process.
+A routing algorithm could be used as well in order to accelerate this process.
 
 .NH 2
 Packet Type
 .LP
 .in 2
-In order to perform multiple actions, a packet type, on 1 byte, is set in
-the packet. This field contain a common integer that describes the type of
+In order to perform multiple actions, a packet type, 1 byte in length, is set
+in the packet. This field contains a common integer that describes the type of
 action to be performed. Read the Type * sections for more information about
 them.
 
@@ -198,8 +198,8 @@ version.
                         .... 0101 = Minor Version 5
 
 
-The length field describe the total length of the packet, starting from byte
-0 of the N2NP header to last byte of the data field.
+The length field describes the total length of the packet, starting from byte
+0 of the N2NP header and ending at the last byte of the data field.
 
 .bp
 
@@ -210,8 +210,8 @@ PING
 .LP
 .in 2
 The PING packet type describes an action to test the reachability and the
-availability of a device. This type does not have any data paired with.
-On a PING, a device shall respond with a PONG in order to assure the original
+availability of a device. This type does not have any data associeated with it.
+On a PING a device shall respond with a PONG in order to assure the original
 sender of its reachability.
 It is described with the value 0x1 (1) in the packet type field.
 
@@ -235,17 +235,17 @@ It is described with the value 0x2 (2) in the packet type field.
 SERVICE
 .LP
 .in 2
-The SERVICE packet is used to describe a payload type, in order to the
+The SERVICE packet is used to describe a payload type in order for the
 receiver to know what type of data will follow the header. If a SERVICE type
-is specified, data payload MUST follow the header. A data payload shall be
-always in the following frame:
+is specified a data payload MUST follow the header. A data payload shall
+always be in the following frame:
 
                             Example Service Payload
 
 .in 0
 ┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Octet ┃               0               ┃                 1                   ┃
-┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
 ┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
 ┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
 │ 0     │        Service Type           │             Data Length             │
@@ -255,15 +255,15 @@ always in the following frame:
 .in 2
 
 The Service Type field describes a 1 byte code used to define the service
-that it is used on this payload. Data Length describes the size of the
-following data field. One can chain multiple SERVICE payload:
+that this payload is processed with. Data Length describes the size of the
+following data field. One can chain multiple SERVICE payloads:
 
                              Two services payloads
 
 .in 0
 ┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Octet ┃               0               ┃                 1                   ┃
-┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
 ┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
 ┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
 │ 0     │      First Service Type       │         First Data Length           │
@@ -288,9 +288,9 @@ field.
 PEERS
 .LP
 .in 2
-The PEERS packet type describe the state of a node with its neighbors. It can
+The PEERS packet type describes the state of a node with its neighbors. It can
 be used for different purposes, when a client is joining the network, to
-update the score of a peer or when a node loose a peer. It is described with
+update the score of a peer or when a node looses a peer. It is described with
 the value 0x4 (4) in the packet type field.
 
                               PEERS packet header
@@ -298,7 +298,7 @@ the value 0x4 (4) in the packet type field.
 .in 0
 ┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Octet ┃               0               ┃                 1                   ┃
-┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
 ┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
 ┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
 │ 0     │           Peer size           │                Data                 │
@@ -307,14 +307,14 @@ the value 0x4 (4) in the packet type field.
 └───────┴─────────────────────────────────────────────────────────────────────┘
 .in 2
 
-The Peer size field does describe the number of couples score-ID
-present in the packet. A score - device ID pair is a simple data structure:
+The Peer size field describes the number of score-ID couples present in the
+packet. A score - device ID pair is a simple data structure:
 
 
 .in 0
 ┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Octet ┃               0               ┃                 1                   ┃
-┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
 ┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
 ┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
 │ 0     │             Score             │             Device ID               │
@@ -325,20 +325,20 @@ present in the packet. A score - device ID pair is a simple data structure:
 └───────┴───────────────────────────────┘
 .in 2
 
-The Score field describe the current score of the Device ID node, perceived
+The Score field describes the current score of the Device ID node perceived
 by the source node; It is used to choose a best path when routing is needed.
-The Device ID describes the peer device ID, on 4 bytes.
+The Device ID describes the peer device ID on 4 bytes.
 
 Those packets are broadcast by nature; if a client happens to receive a PEERS
-packet, the Destination Device Identifier in the N2NP header shall be set at
+packet, the Destination Device Identifier in the N2NP header shall be set to
 0. Upon joining, a new node wanting to announce itself on the network must
 use a PEER packet: it announces the current peers of the node, and their
 score. For peer list and score calculation, see the relevant section. It is
 also used when a node want to announce an update on his peers: a peer has
 been lost, a peer score has changed, or a new peer has arrived.
 
-Upon reception of a PEER packet, a client must update his intern routing
-table with the information in the PEER packet. A routing table entry consist
+Upon reception of a PEER packet, a client must update his internal routing
+table with the information in the PEER packet. A routing table entry consists
 of two things: the mother device ID, and a list of paired score-IDS of the
 peers linked with the mother device. It could be represented like this:
 
@@ -354,7 +354,7 @@ peers linked with the mother device. It could be represented like this:
 
 The PEER packet is join-agnostic: a client receiving a packet must not care
 if the sender just joined the network or is just updating information about 
-his peers. The client must update his intern routing table either way, and 
+his peers. The client must update his internal routing table either way, and 
 create a new entry when it is required. A C representation of the routing 
 table could be:
 
@@ -390,7 +390,7 @@ users. It is described by the value 0x1 (1) in the service type field.
 .in 0
 ┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Octet ┃               0               ┃                 1                   ┃
-┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
 ┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
 ┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
 │ 0     │                                                                     │
@@ -408,7 +408,7 @@ Sequence Number
 .LP
 .in 2
 The Sequence Number field is used to describe a sequence in the
-communication. This information is useful to the devices, in order to track
+communication. This information is useful to the devices in order to track
 a progression in a communication. On the beginning of a session, the first
 packet sender shall set this field to 0. The mechanic behind it is the same
 as TCP 
@@ -416,7 +416,7 @@ as TCP
 .[
 TCP RFC793
 .]]
-, the receiver shall increment this field with length it received.
+, the receiver shall increment this field with the length of the data it received.
 
                         Example of a communication
 
@@ -425,13 +425,13 @@ TCP RFC793
     CLIENT_1 ->          CHAT, ACK, sequence_number = 17           -> CLIENT_2
 
 The ACK flag is described in the 4.1.3 section.
-If a sequence number the maximum value of a 2 byte integer, the client that
-will overflow the sequence number shall re-beginning at 1.
+If a sequence number exceeds the maximum value of a 2 byte integer the client
+that will overflow the sequence number shall start over at 1.
 .NH 3
 Flags
 .LP
 .in 2
-The Flags field is used to describe multiple boolean information
+The Flags field is used to describe multiple boolean informations
 
                              1... .... = ACK
                              .1.. .... = CHA
@@ -446,14 +446,14 @@ The ACK flag describes an acknowledgment of data. If the ACK flag is set,
 the sequence number field shall contain the sequence of the data
 acknowledged.
 
-The CHA flag describes a message that is to be sent to multiple people,
-(a Channel). If this flag is set, the payload will not be a simple ascii 
+The CHA flag describes a message that is to be sent to multiple people
+(a Channel). If this flag is set, the payload will not be a simple UTF-8
 message, but rather this payload:
 
 .in 0
 ┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Octet ┃               0               ┃                 1                   ┃
-┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
 ┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
 ┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
 │ 0     │                          Channel ID                                 │
@@ -462,21 +462,22 @@ message, but rather this payload:
 └───────┴─────────────────────────────────────────────────────────────────────┘
 .in 2
 
-The Channel ID, on 2 bytes, describes the ID of an channel than a client want
-to ass his message to. This ID is handled with the CRT message mechanic, see
-the appropriate section for more information. This packet is, by essence, a
+The Channel ID, 2 bytes in legth, describes the ID of a channel that a client
+wants to pass his message to. This ID is handled with the CRT message mechanic,
+see the appropriate section for more information. This packet is, in essence, a
 broadcast; The destination device ID should be set to 0. Every client must
-relay this message to their neighbors, and log it internally. This way, if a 
-client shall join a channel, it will have history (at least from the moment 
-of he joined the network), and when this client wants to join / leave a channel
-he will be doing it internally, without announcing it to the all network.
+relay this message to their neighbors, and log it internally. This way, when a 
+client joins a channel, it will have a history (at least from the moment 
+he joined the network). When a client wants to join / leave a channel he will
+be doing this internally, without announcing it to the network.
 
-A client must deduce the data len from the following math:
+A client must deduce the data length from the following math:
 
                  chat->message_length - sizeof(CHA->channel_id)
 
 The FRG flag describes a fragmentation of data. If this flag is set, the
-receiver shall expect one or more packets in order to complete the data.
+receiver shall expect one or more further packets in order to complete
+the data.
 
                        Incorrect fragmented exchange:
 
@@ -485,8 +486,8 @@ receiver shall expect one or more packets in order to complete the data.
             CLIENT_1 ->   CHAT "World !", MSG, seq = 0   -> CLIENT_2
             CLIENT_1 <-        CHAT, ACK, seq = 12       <- CLIENT_2
 
-  In the example above, one can see that the CLIENT_2 ACKed the data before
-  the reception of the second and final packet: this is not standard; the
+  In the example above, one can see that CLIENT_2 ACKed the data before
+  the reception of the second and final packet: this is not standard;
   CLIENT_1 shall not wait for an acknowledgment of data before sending more
   fragmented packets. The exchange above should have happened like this:
 
@@ -496,21 +497,20 @@ receiver shall expect one or more packets in order to complete the data.
             CLIENT_1 ->   CHAT "World !", MSG, seq = 0   -> CLIENT_2
             CLIENT_1 <-       CHAT, ACK, seq = 12        <- CLIENT_2
 
-When a client has sent the final packet of his fragmented data, the FRG flag
-must be unset; otherwise the other client will wait indefinitely for another
-packet.
+A client must unset the FRG flag when sending the final packet of fragmented
+data; otherwise the other client will wait indefinitely for another packet.
 
 The MSG flag describes a standard chat exchange: the payload will be nothing 
-more than a normal utf-8 message. This flag cannot be set with the CHA flag.
+more than a normal UTF-8 message. This flag cannot be set with the CHA flag.
 
 The CRT flag describes the creation of a channel to the entire network, and
-announce a channel ID with an human-readable name. If this flag is set, the 
-payload will not be a simple ascii message, but rather this payload:
+announce a channel ID with a human-readable name. If this flag is set, the 
+payload will not be a simple UTF-8 message, but rather this payload:
 
 .in 0
 ┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Octet ┃               0               ┃                 1                   ┃
-┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
 ┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
 ┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
 │ 0     │                          Channel ID                                 │
@@ -530,13 +530,13 @@ ask his direct neighbors an update of his internal channel ID table. He will
 be doing so using the UPD flag.
 
 The UPD flag describes a request from a client whose internal channel ID table
-is outdated, wether he was disonnected at the time of the creation, or simply
+is outdated, whether he was disonnected at the time of the creation, or simply
 miss it, to his direct neighbors. The payload shall be simply:
 
 .in 0
 ┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Octet ┃               0               ┃                 1                   ┃
-┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
 ┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
 ┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
 │ 0     │                          Channel ID                                 │
@@ -548,7 +548,7 @@ and respond with a simple payload too:
 .in 0
 ┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Octet ┃               0               ┃                 1                   ┃
-┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
 ┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
 ┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
 │ 0     │                         Channel Name                                │
@@ -556,7 +556,7 @@ and respond with a simple payload too:
 .in 2
 
 The ACK and UPD flag must be set for this response.
-In the case where the neighbor do not know the channel ID either, it must
+In the case where the neighbor does not know the channel ID either, it must
 ask his neighbors (minus the original sender) for this information, following
 the same process. Upon reception of the response, it must update his table, and
 pass the information to the original sender.
@@ -565,9 +565,9 @@ pass the information to the original sender.
 Message
 .LP
 .in 2
-The Message field contain the payload message sent by the user to another
-one. It is assumed that this field is encoded with utf-8. The size of this
-field is described in the Message Length field. If this field is set at 0, it
+The Message field contains the payload message sent by the user to another
+one. It is assumed that this field is encoded with UTF-8. The size of this
+field is described in the Message Length field. If this field is set to 0, it
 is assumed that the Message field will be empty.
 
 .NH 2
@@ -587,7 +587,7 @@ to 0 (zero).
 .in 0
 ┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Octet ┃               0               ┃                 1                   ┃
-┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
 ┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
 ┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
 │ 0     │                                                                     │
@@ -604,12 +604,11 @@ Issued Timestamp & Expires
 .LP
 .in 2
 The first four bytes describes a Unix EPOCH timestamp. This timestamp is the
-This timestamp is the time at which the original author sent the broadcast.
-It can't be in the future, if such a thing would happen, a client must drop
-the broadcast, and not relay it. The Expires field describes the number of
-hours that the broadcast is valid starting from the Issued timestamp. Client
-should be doing the following addition in order to check the validity of a
-broadcast
+time at which the original author sent the broadcast. It can't be in the
+future, if such a thing would happen, a client must drop the broadcast, and
+not relay it. The Expires field describes the number of hours that the
+broadcast is valid starting from the Issued timestamp. Clients should be doing
+the following addition in order to check the validity of a broadcast
 
                 Condition to check the validity of broadcast
 
@@ -619,7 +618,7 @@ broadcast
 Message
 .LP
 .in 2
-The Message field contain the data to be delivered; It is not formatted in
+The Message field contains the data to be delivered; It is not formatted in
 any fashion. In order to get the size of this data, one must use the
 Message Length field.
 
@@ -634,7 +633,7 @@ also have low-data requirements due to the physical transportation limitation.
 Also, as a node on the network may be moving, high reliability is a must.
 
 The entire routing is based on the principle that all nodes on the network
-knows every node's neighbors; therefore, every node can determine a path for
+know every node's neighbors; therefore, every node can determine a path for
 every packet.
 
 .NH 2
@@ -642,7 +641,7 @@ Peer Information
 .LP
 .in 2
 Peer's neighbors are not the only information provided by every host on the
-network; every host assign a score to their neighbors, based on signal
+network; every host assigns a score to their neighbors, based on signal
 strength and distance. This value is to be used in the heuristic algorithm in
 order to evaluate the weight of a path.
 
@@ -650,7 +649,7 @@ order to evaluate the weight of a path.
 Score calculation
 .LP
 .in 2
-A score describes the state of a node from the point of view of an other
+A score describes the state of a node from the point of view of another
 node. Those two nodes must be within physical reach of each other for a score to be
 determined: it is used as weight value for the path-finding heuristic.
 A score is determined through the following equation / heuristic:
@@ -667,7 +666,7 @@ This broadcast is launched when one of the following conditions are met:
 - A node has timed out
 - A peer score has changed
 
-In all of these cases, the main node needs to update the whole network if
+In all of these cases, the main node needs to update the whole network with
 this new information; In order to calculate a path reliably, every node on
 the network must know the neighbors of everyone: it is not intended to be
 a real-time information, but rather an indicative information.
@@ -685,7 +684,7 @@ be packed whenever possible.
 
 If a node B is to retransmit the update data of the node A, and the node B 
 itself has broadcast data in the output pipe, the B node must pack the node A 
-information with it's information, and send one and only packet to be relayed 
+information with it's information, and send only one packet to be relayed 
 by its peers. 
 
 Of course, this packed data length should not exceed the packet maximum size, 
@@ -699,7 +698,7 @@ ROUTING ALGORITHM
 .LP
 When a packet is sent from one device with the intent of speaking to a another
 device directly, routing must be involved. In order to assure delivering
-reliability, the N2NP uses a mix between an HEAT algorithm, with node score
+reliably, the N2NP uses a mix between the HEAT algorithm, with node score
 attribution, and a static route routing algorithm. You can find the details
 about score attribution in the relevant section, along with the routing table
 information.
@@ -718,14 +717,14 @@ each other: therefore, no routing is needed.
 
 But, if those two nodes are not directly connected to each other, node A must 
 determine the best route to reach node Z. In order to do that, and with all the 
-information about all the nodes on the network (See PEERS), node A must run an 
-heuristic algorithm on all his peers node (physically connected) with the score 
+information about all the nodes on the network (See PEERS), node A must run a 
+heuristic algorithm on all his peer nodes (physically connected) with the score 
 of each node as weight.
 
 In order not to loose time in the process, the depth used for the
-algorithm should be minimal: node A do not need to determine an exact
-perfect path all the way to node Z, but rather choose between his direct
-peers, the one that will be more suited to route this packet.
+algorithm should be minimal: node A does not need to determine an exact
+perfect path all the way to node Z, but rather choose the peer that will be
+most suited to route this packet.
 
 
 .in 0
@@ -739,19 +738,19 @@ Node A         \\ Node G ----- /    |           \\-- Node H                Node 
 .in 2
 
 Let's take the above schema: node A still wants to reach node Z.
-In order to do that, node A must determine the best path from
-his direct peer; in this case it's quite simple; node A only has one peer.
+In order to do that, node A must determine the best path through one of
+his direct peers; in this case it's quite simple; node A only has one peer.
 
 Node A sends the packet to node B, and it's now the turn of node B to
-determine the best path from his peer. Here, we got two peers nodes: C and G.
+determine the best path through one of his peers. Here, we got two peer nodes: C and G.
 With the score of both it's direct peers, and all the ones beyond these, node
 B must now determine the best path to route this packet. 
 
-It is important to note that node B's intern routing table, that describes all 
+It is important to note that node B's internal routing table, that describes all 
 the scores of everyone on the network, does not need to be updated in real
-time: the node can determine a good-enough path to the next hop with it's data. 
+time: the node can determine a good-enough path to the next hop with its data. 
 
-Let's say, for the sake of the example, that node C has a score of 40, and G, a 
+Let's say, for the sake of the example, that node C has a score of 40, and G a 
 score of 55. Since both C and G share the same output node, D, their exit score
 will be the same. So the node B must compare the score of C and G in order to 
 route the packet properly.
@@ -759,7 +758,7 @@ route the packet properly.
 In this example, G got a bigger score than C, so node B
 will route the packet to G. Node G, upon reception, will do the same
 algorithm in order to route the packet to the next node, and the next node
-will do the same, and so on to the final destination node.
+will do the same, and so on until the destination node is reached.
 
 
 .NH 3
