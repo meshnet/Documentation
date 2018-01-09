@@ -1,9 +1,11 @@
 <html>
     <head>
         <title>Meshnet/Documentation</title>
-        <link ref="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
         <style>
             html, body {
+                font-family: 'Inconsolata', monospace;
                 height: 100%;
                 width: 100%;
                 margin: 0;
@@ -24,6 +26,10 @@
                 color: white;
             }
 
+            pre .bg {
+                color: #fff3;
+            }
+
             h3 {
                 text-align: center;
                 margin-bottom: 1%;
@@ -34,8 +40,15 @@
             }
 
             #main-list ul:first-child {
-                width: 23%;
-                margin: auto;
+                margin: 0 auto;
+                display: table;
+            }
+
+            #main-list ul li ul {
+                text-align: left;
+                display: inline-block;
+                width: 100%;
+                padding-bottom: 5px;
             }
 
             a {
@@ -49,7 +62,10 @@
 
             footer {
                 position: absolute;
-                bottom: 0;
+                bottom: -1;
+                left: -1;
+                border: 1px solid #ffffff4d;
+                padding-right: 50px;
             }
 
             footer ul {
@@ -60,27 +76,38 @@
             footer ul li {
                 display: inline-block;
             }
+
+            i {
+                margin-left: 10px;
+                margin-right: 5px;
+            }
         </style>
     </head>
     <body>
         <pre>
-__/\\\\____________/\\\\______________________________/\\\__________/\\\\\_____/\\\______________________________        
- _\/\\\\\\________/\\\\\\_____________________________\/\\\_________\/\\\\\\___\/\\\______________________________       
-  _\/\\\//\\\____/\\\//\\\_____________________________\/\\\_________\/\\\/\\\__\/\\\____________________/\\\______      
-   _\/\\\\///\\\/\\\/_\/\\\_____/\\\\\\\\___/\\\\\\\\\\_\/\\\_________\/\\\//\\\_\/\\\_____/\\\\\\\\___/\\\\\\\\\\\_     
-    _\/\\\__\///\\\/___\/\\\___/\\\/////\\\_\/\\\//////__\/\\\\\\\\\\__\/\\\\//\\\\/\\\___/\\\/////\\\_\////\\\////__    
-     _\/\\\____\///_____\/\\\__/\\\\\\\\\\\__\/\\\\\\\\\\_\/\\\/////\\\_\/\\\_\//\\\/\\\__/\\\\\\\\\\\_____\/\\\______   
-      _\/\\\_____________\/\\\_\//\\///////___\////////\\\_\/\\\___\/\\\_\/\\\__\//\\\\\\_\//\\///////______\/\\\_/\\__  
-       _\/\\\_____________\/\\\__\//\\\\\\\\\\__/\\\\\\\\\\_\/\\\___\/\\\_\/\\\___\//\\\\\__\//\\\\\\\\\\____\//\\\\\___ 
-        _\///______________\///____\//////////__\//////////__\///____\///__\///_____\/////____\//////////______\/////____
+<span class='bg'>_</span><span class='bg'>_</span>/\\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>/\\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>/\\\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>        
+ <span class='bg'>_</span>\/\\\\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>/\\\\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>       
+  <span class='bg'>_</span>\/\\\//\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>/\\\//\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\/\\\<span class='bg'>_</span><span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>      
+   <span class='bg'>_</span>\/\\\\///\\\/\\\/<span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>/\\\\\\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>/\\\\\\\\\\<span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\//\\\<span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>/\\\\\\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>/\\\\\\\\\\\<span class='bg'>_</span>     
+    <span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span>\///\\\/<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>/\\\/////\\\<span class='bg'>_</span>\/\\\//////<span class='bg'>_</span><span class='bg'>_</span>\/\\\\\\\\\\<span class='bg'>_</span><span class='bg'>_</span>\/\\\\//\\\\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>/\\\/////\\\<span class='bg'>_</span>\////\\\////<span class='bg'>_</span><span class='bg'>_</span>    
+     <span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\///<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span>/\\\\\\\\\\\<span class='bg'>_</span><span class='bg'>_</span>\/\\\\\\\\\\<span class='bg'>_</span>\/\\\/////\\\<span class='bg'>_</span>\/\\\<span class='bg'>_</span>\//\\\/\\\<span class='bg'>_</span><span class='bg'>_</span>/\\\\\\\\\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>   
+      <span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\<span class='bg'>_</span>\//\\///////<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\////////\\\<span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\<span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span>\//\\\\\\<span class='bg'>_</span>\//\\///////<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\<span class='bg'>_</span>/\\<span class='bg'>_</span><span class='bg'>_</span>  
+       <span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span>\//\\\\\\\\\\<span class='bg'>_</span><span class='bg'>_</span>/\\\\\\\\\\<span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/\\\<span class='bg'>_</span>\/\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\//\\\\\<span class='bg'>_</span><span class='bg'>_</span>\//\\\\\\\\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\//\\\\\<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span> 
+        <span class='bg'>_</span>\///<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\///<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\//////////<span class='bg'>_</span><span class='bg'>_</span>\//////////<span class='bg'>_</span><span class='bg'>_</span>\///<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\///<span class='bg'>_</span><span class='bg'>_</span>\///<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/////<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\//////////<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>\/////<span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span><span class='bg'>_</span>
 </pre>
      <h3>Documentation</h3>
         <div id="main-list">
             <ul>
-                <li>/protocols/</li>
-                <ul>
-                    <li>Node to Node Protocol <a href="protocols/N2NP.html">[HTML]</a> <a href="protocols/N2NP.term">[UTF-8]</a> <a href="N2NP.txt">[ASCII]</a></li>
-                </ul>
+                <li>/videos/
+                    <ul>
+                        <li>Original Idea > <a href="https://www.youtube.com/watch?v=zXTEWFb_6w4">[YOUTUBE]</a></li>
+                    </ul>
+                </li>
+                <li>/protocols/
+                    <ul>
+                        <li>Node to Node Protocol > <a href="protocols/N2NP.html">[HTML]</a> <a href="protocols/N2NP.term">[UTF-8]</a> <a href="N2NP.txt">[ASCII]</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
         <footer>
