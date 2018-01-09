@@ -5,6 +5,7 @@ before_install:
 script:
     - make -C protocols/ all html
     - cp theme/index.html .
+    - mkdir build && cp -v protocols/*.{html,txt,term} build/.
 
 deploy:
     provider: pages
