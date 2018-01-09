@@ -14,4 +14,3 @@ deploy:
     on:
         branch:
             - master
-            - work/louis/travis
