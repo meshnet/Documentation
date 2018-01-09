@@ -3,7 +3,7 @@ before_install:
     - sudo apt-get install -y groff
 
 script:
-    - cd protocols && make all html
+    - make -C protocols/ all html
     - cp theme/index.html .
 
 deploy:
