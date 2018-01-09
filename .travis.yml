@@ -1,0 +1,16 @@
+before_install:
+    - sudo apt-get -qq update
+    - sudo apt-get install -y groff
+
+script:
+    - cd protocols && make all html
+    - cp theme/index.html .
+
+deploy:
+    provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    on:
+        branch:
+            - master
+            - work/louis/travis
