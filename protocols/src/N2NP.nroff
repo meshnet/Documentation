@@ -159,9 +159,9 @@ Frame
 Device Identification
 .LP
 .in 2
-In order to identify a device uniquely the N2NP uses a hashed identifier with
+In order to identify a device uniquely, the N2NP uses a hashed identifier with
 a length of 4 bytes. The original hashed content and the size of those fields
-are not finally decided yet, so those are subjects to changes.
+are not finally decided yet, so those are subject to change.
 In a packet, the protocol shall define a source identifier (FROM) and a
 destination identifier (TO). These fields are to be used by the neighboring
 nodes in order to relay the packet to its final destination.
@@ -235,9 +235,9 @@ It is described with the value 0x2 (2) in the packet type field.
 SERVICE
 .LP
 .in 2
-The SERVICE packet is used to describe a payload type in order for the
+The SERVICE packet is used to describe a payload type, in order for the
 receiver to know what type of data will follow the header. If a SERVICE type
-is specified a data payload MUST follow the header. A data payload shall
+is specified, a data payload MUST follow the header. A data payload shall
 always be in the following frame:
 
                             Example Service Payload
@@ -468,7 +468,7 @@ see the appropriate section for more information. This packet is, in essence, a
 broadcast; The destination device ID should be set to 0. Every client must
 relay this message to their neighbors, and log it internally. This way, when a 
 client joins a channel, it will have a history (at least from the moment 
-he joined the network). When a client wants to join / leave a channel he will
+he joined the network). When a client wants to join / leave a channel, he will
 be doing this internally, without announcing it to the network.
 
 A client must deduce the data length from the following math:
@@ -723,8 +723,8 @@ of each node as weight.
 
 In order not to loose time in the process, the depth used for the
 algorithm should be minimal: node A does not need to determine an exact
-perfect path all the way to node Z, but rather choose the peer that will be
-most suited to route this packet.
+perfect path all the way to node Z, but rather choose the direct peer that will
+be most suited to route this packet.
 
 
 .in 0
@@ -742,9 +742,9 @@ In order to do that, node A must determine the best path through one of
 his direct peers; in this case it's quite simple; node A only has one peer.
 
 Node A sends the packet to node B, and it's now the turn of node B to
-determine the best path through one of his peers. Here, we got two peer nodes: C and G.
-With the score of both it's direct peers, and all the ones beyond these, node
-B must now determine the best path to route this packet. 
+determine the best path through one of his direct peers. Here, we got two peer
+nodes: C and G. With the score of both it's direct peers, and all the ones beyond
+these, node B must now determine the best path to route this packet. 
 
 It is important to note that node B's internal routing table, that describes all 
 the scores of everyone on the network, does not need to be updated in real
