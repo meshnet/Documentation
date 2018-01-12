@@ -226,7 +226,7 @@ November 2017                                             Node to Node Protocol
 
 2.3  Device Identification
 
-  In order to identify a device from another, the N2NP protocol will use an hashed
+  In order to identify a device from another, the N2NP protocol will use a hashed
   identifier of 4 bytes. The original hashed content and the size of those
   fields are not decided yet, so those are subjects to changes.
   In a packet, the protocol shall define a source identifier (FROM) and a
@@ -243,7 +243,7 @@ November 2017                                             Node to Node Protocol
 
 2.4.  Packet Type
 
-  In order to perform multiple actions, a packet type, on 1 byte, is set in
+  In order to perform multiple actions, a packet type on 1 byte, is set in
   the packet. This type contain a common integer that describes the type of
   action to be performed. Read the Type * sections for more information about
   them.
