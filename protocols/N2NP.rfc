@@ -567,8 +567,8 @@ November 2017                                             Node to Node Protocol
 
 4.2.2.  Message
 
-  The Message field contain the data to be delivered; It is not formatted in
-  any fashion. In order to get the size of this data, one must use the
+  The Message field contains the data to be delivered; It is not formatted in
+  any fashion. In order to get the size of this data, you must use the
   Message Length field.
 
 
