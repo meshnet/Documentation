@@ -54,25 +54,25 @@ device driver.
   3.3 SERVICE ................................................................ 6
   3.4 PEERS .................................................................. 7
 
-4. SERVICES .................................................................. 9
-  4.1 CHAT ................................................................... 9
-    4.1.1 Source and Destination User ID ..................................... 9
-    4.1.2 Sequence Number ................................................... 10
-    4.1.3 Flags ............................................................. 10
-    4.1.4 Message ........................................................... 11
-  4.2 BROADCAST ............................................................. 11
-    4.2.1 Issued Timestamp & Expires ........................................ 12
-    4.2.2 Message ........................................................... 12
+4. SERVICES ................................................................. 10
+  4.1 CHAT .................................................................. 10
+    4.1.1 Sequence Number ................................................... 10
+    4.1.2 Flags ............................................................. 11
+    4.1.3 Message ........................................................... 13
+  4.2 BROADCAST ............................................................. 14
+    4.2.1 Issued Timestamp & Expires ........................................ 15
+    4.2.2 Message ........................................................... 15
 
-5.  ROUTING ................................................................. 13
-  5.1. PEER INFORMATION ..................................................... 13
-    5.1.1. Score calculation ................................................ 13
-    5.1.2. Update Broadcast ................................................. 13
-    5.1.3. Update Broadcast data optimization ............................... 14
-  5.2. ROUTING ALGORITHM .................................................... 14
-    5.2.1. General Description .............................................. 14
-    5.2.2. Dijkstra's algorithm ............................................. 15
-    5.2.3. Broadcast routing ................................................ 15
+5.  ROUTING ................................................................. 16
+  5.1. PEER INFORMATION ..................................................... 16
+    5.1.1. Score calculation ................................................ 16
+    5.1.2. Update Broadcast ................................................. 16
+    5.1.3. Update Broadcast data optimization ............................... 17
+  5.2. ROUTING ALGORITHM .................................................... 17
+    5.2.1. General Description .............................................. 17
+    5.2.2. Dijkstra's algorithm ............................................. 18
+    5.2.3. Broadcast routing ................................................ 18
+    5.2.4. Protocol routing ................................................. 19
 
 
 .bp
@@ -173,7 +173,7 @@ have multiple neighbors, and assuming the physical layer of the protocol
 (radio) can't handle a non-broadcast emission, a third ID is used; It
 describes the physical neighbor that will relay this packet. If the final
 destination node is within physical reach, this field is useless, and its value
-should be ignored.
+should be set to '0' (zero).
 
 .NH 2
 Packet Type
@@ -819,3 +819,26 @@ storage, see that this packet has already been relayed, and simply drop it.
 
 With this method, we keep simplicity through routing, without much data
 overhead and broadcast replay problems.
+
+.NH 3
+Protocol routing
+.LP
+.in 2
+When the next peer ID has been determined, the node must physically route and
+send the packet to the said node. In order to do that, the field 'Next Physical
+Device Identifier' in the header (Section 2.2 Frame) must be set to this ID.
+
+The two other fields, Source / Destination ID, should not be changed in any way
+by a relay-node; it is not necessary.
+
+Upon reception of a packet, a node should look at those fields:
+
+- If the Destination Device ID is his ID and the Next Physical ID is set to 0,
+the packet should be sent to userspace for treatment.
+
+- If the Destination Device ID is not his ID but the Next Physical ID is, the
+packet should not leave kernel-space and be properly relayed according to this
+specification (Section 5 ROUTING).
+
+- Otherwise, the packet should be dropped.
+
