@@ -172,8 +172,8 @@ nodes in order to relay the packet to its final destination. Since a node can
 have multiple neighbors, and assuming the physical layer of the protocol
 (radio) can't handle a non-broadcast emission, a third ID is used; It
 describes the physical neighbor that will relay this packet. If the final
-destination node is within physical reach, this field is useless, and should
-be ignored.
+destination node is within physical reach, this field is useless, and its value
+should be ignored.
 
 .NH 2
 Packet Type
