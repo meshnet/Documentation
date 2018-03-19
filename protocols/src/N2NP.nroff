@@ -152,7 +152,11 @@ Frame
 ├───────┤                 Destination Device Identifier                       │
 │ 10    │                                                                     │
 ├───────┼─────────────────────────────────────────────────────────────────────┤
-│ 12    │                            Data ...                                 │
+│ 12    │                                                                     │
+├───────┤                Next Physical Device Identifier                      │
+│ 14    │                                                                     │
+├───────┼─────────────────────────────────────────────────────────────────────┤
+│ 16    │                            Data ...                                 │
 └───────┴─────────────────────────────────────────────────────────────────────┘
 
 .NH 2
@@ -164,8 +168,12 @@ a length of 4 bytes. The original hashed content and the size of those fields
 are not finally decided yet, so those are subject to change.
 In a packet, the protocol shall define a source identifier (FROM) and a
 destination identifier (TO). These fields are to be used by the neighboring
-nodes in order to relay the packet to its final destination.
-A routing algorithm could be used as well in order to accelerate this process.
+nodes in order to relay the packet to its final destination. Since a node can
+have multiple neighbors, and assuming the physical layer of the protocol
+(radio) can't handle a non-broadcast emission, a third ID is used; It
+describes the physical neighbor that will relay this packet. If the final
+destination node is within physical reach, this field is useless, and should
+be ignored.
 
 .NH 2
 Packet Type
@@ -591,19 +599,23 @@ to 0 (zero).
 ┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
 ┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
 │ 0     │                                                                     │
-├───────┤                        Issued Timestamp                             │
+├───────┤                                                                     │
 │ 2     │                                                                     │
+├───────┤                        Issued Timestamp                             │
+│ 4     │                                                                     │
+├───────┤                                                                     │
+│ 6     │                                                                     │
 ├───────┼──────────────────────────────┬──────────────────────────────────────┤
-│ 4     │           Expires            │          Message Length              │
+│ 8     │           Expires            │          Message Length              │
 ├───────┼──────────────────────────────┴──────────────────────────────────────┤
-│ 6     │                           Message                                   │
+│ 10    │                           Message                                   │
 └───────┴─────────────────────────────────────────────────────────────────────┘
 
 .NH 3
 Issued Timestamp & Expires
 .LP
 .in 2
-The first four bytes describes a Unix EPOCH timestamp. This timestamp is the
+The first eight bytes describes a Unix EPOCH timestamp. This timestamp is the
 time at which the original author sent the broadcast. It can't be in the
 future, if such a thing would happen, a client must drop the broadcast, and
 not relay it. The Expires field describes the number of hours that the
