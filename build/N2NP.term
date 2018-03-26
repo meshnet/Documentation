@@ -1,0 +1,1140 @@
+
+
+
+
+
+
+
+
+
+                             [1mNode to Node Protocol[0m
+
+
+                         [4mLouis[24m [4m"Ne02ptzero"[24m [4mSolofrizzo[0m
+                                      [4m0x5c[0m
+                                MeshNet Project
+
+
+                                    [4mABSTRACT[0m
+
+            The Node to Node protocol (N2NP) is intended for use as a
+       reliable host‐to‐host protocol between node devices (hosts) in
+       packet‐switched embedded computer communication networks over
+       radio waves.
+
+       This document describes the function to be performed by the Node
+       to Node Protocol, the programs that implement it, and its inter‐
+       face through a kernel device driver.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MeshNet                                                                 [Page 1]
+
+
+
+
+
+December 2017                          ‐2‐                 Node to Node Protocol
+
+
+
+                               [1mTable of Contents[0m
+
+
+1.  INTRODUCTION ............................................................. 3
+  1.1 Scope of this document ................................................. 3
+  1.2 Abbreviations .......................................................... 3
+
+2.  GENERAL DESCRIPTION ...................................................... 4
+  2.1 Protocol Description ................................................... 4
+  2.2 Frame .................................................................. 5
+  2.3 Device Identification  ................................................. 5
+  2.4 Packet Type ............................................................ 5
+  2.5 Payload ................................................................ 5
+  2.6 Version & Length ....................................................... 5
+
+3.  PACKET TYPES ............................................................. 6
+  3.1 PING ................................................................... 6
+  3.2 PONG ................................................................... 6
+  3.3 SERVICE ................................................................ 6
+  3.4 PEERS .................................................................. 7
+
+4. SERVICES ................................................................. 10
+  4.1 CHAT .................................................................. 10
+    4.1.1 Sequence Number ................................................... 10
+    4.1.2 Flags ............................................................. 11
+    4.1.3 Message ........................................................... 13
+  4.2 BROADCAST ............................................................. 14
+    4.2.1 Issued Timestamp & Expires ........................................ 15
+    4.2.2 Message ........................................................... 15
+
+5.  ROUTING ................................................................. 16
+  5.1. PEER INFORMATION ..................................................... 16
+    5.1.1. Score calculation ................................................ 16
+    5.1.2. Update Broadcast ................................................. 16
+    5.1.3. Update Broadcast data optimization ............................... 17
+  5.2. ROUTING ALGORITHM .................................................... 17
+    5.2.1. General Description .............................................. 17
+    5.2.2. Dijkstra’s algorithm ............................................. 18
+    5.2.3. Broadcast routing ................................................ 18
+    5.2.4. Protocol routing ................................................. 19
+
+
+
+
+
+
+
+
+
+
+MeshNet                                                                 [Page 2]
+
+
+
+
+
+December 2017                          ‐3‐                 Node to Node Protocol
+
+
+[1m1.  INTRODUCTION[0m
+
+[1m1.1.  Scope of this document[0m
+
+  N2NP is a transport and applicative layer for the MeshNet project. It provides
+  communication between two nodes through radio signals. The physical layer
+  (radio) is not yet defined as of this day, and it’s not in the scope of this
+  document. This document shall describe the internal mechanisms of the proto‐
+  col, and its integration within the MeshNet project.
+
+[1m1.2.  Abbreviations[0m
+
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Abbreviation ┃ Meaning                                                      ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ N2NP         │ Node‐to‐Node protocol                                        │
+├──────────────┼──────────────────────────────────────────────────────────────┤
+│ HW           │ Hardware                                                     │
+└──────────────┴──────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MeshNet                                                                 [Page 3]
+
+
+
+
+
+December 2017                          ‐4‐                 Node to Node Protocol
+
+
+[1m2.  GENERAL DESCRIPTION[0m
+
+[1m2.1.  Protocol Description[0m
+
+
+
+                               Protocol Layering
+
+                              +‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐+
+                              |                  |
+                              |  Physical Layer  |
+                              |                  |
+                              +‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐+
+                              |                  |
+                              |       N2NP       |
+                              |                  |
+                              +‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐+
+
+                                    Figure 1
+
+  The N2NP is over the physical layer [Figure 1] The physical layer is charged
+  with transportation of the packet, and will be likely over radio waves with
+  low frequencies. That implies very low bandwidth, and the protocol must be
+  designed with this requirement in mind.  Since it does not handle transporta‐
+  tion, the N2NP can focus on the Routing and the data side of a communication.
+  It is assumed that if a packet is not compliant with this specification, a
+  client should drop it.
+
+
+[1m2.2.  Frame[0m
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │ Major Version │ Minor Version │           Packet Length             │
+├───────┼───────────────┴───────────────┼─────────────────────────────────────┤
+│ 2     │         Packet Length         │            Packet Type              │
+├───────┼───────────────────────────────┴─────────────────────────────────────┤
+│ 4     │                                                                     │
+├───────┤                   Source Device Identifier                          │
+│ 6     │                                                                     │
+├───────┼─────────────────────────────────────────────────────────────────────┤
+│ 8     │                                                                     │
+├───────┤                 Destination Device Identifier                       │
+│ 10    │                                                                     │
+├───────┼─────────────────────────────────────────────────────────────────────┤
+
+
+
+MeshNet                                                                 [Page 4]
+
+
+
+
+
+December 2017                          ‐5‐                 Node to Node Protocol
+
+
+│ 12    │                                                                     │
+├───────┤                Next Physical Device Identifier                      │
+│ 14    │                                                                     │
+├───────┼─────────────────────────────────────────────────────────────────────┤
+│ 16    │                            Data ...                                 │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+
+
+[1m2.3.  Device Identification[0m
+
+  In order to identify a device uniquely, the N2NP uses a hashed identifier with
+  a length of 4 bytes. The original hashed content and the size of those fields
+  are not finally decided yet, so those are subject to change.  In a packet, the
+  protocol shall define a source identifier (FROM) and a destination identifier
+  (TO). These fields are to be used by the neighboring nodes in order to relay
+  the packet to its final destination. Since a node can have multiple neighbors,
+  and assuming the physical layer of the protocol (radio) can’t handle a non‐
+  broadcast emission, a third ID is used; It describes the physical neighbor
+  that will relay this packet. If the final destination node is within physical
+  reach, this field is useless, and its value should be set to ’0’ (zero).
+
+
+[1m2.4.  Packet Type[0m
+
+  In order to perform multiple actions, a packet type, 1 byte in length, is set
+  in the packet. This field contains a common integer that describes the type of
+  action to be performed. Read the Type * sections for more information about
+  them.
+
+
+[1m2.5.  Payload[0m
+
+  The payload of a packet (Data, in the Frame in 2.2) is filled with data.  This
+  field does not have a fixed size, and its content depends on the packet type.
+  For example, a PING will not have any data.
+
+
+[1m2.6.  Version & Length[0m
+
+  The first byte of the packet is used to describe the protocol version. The
+  first 4 bits are used for the major version, the last 4 bits for the minor
+  version.
+
+                              Example version byte
+
+                          0100 .... = Major Version 4
+                          .... 0101 = Minor Version 5
+
+
+
+
+MeshNet                                                                 [Page 5]
+
+
+
+
+
+December 2017                          ‐6‐                 Node to Node Protocol
+
+
+  The length field describes the total length of the packet, starting from byte
+  0 of the N2NP header and ending at the last byte of the data field.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MeshNet                                                                 [Page 6]
+
+
+
+
+
+December 2017                          ‐7‐                 Node to Node Protocol
+
+
+[1m3.  PACKET TYPES[0m
+
+[1m3.1.  PING[0m
+
+  The PING packet type describes an action to test the reachability and the
+  availability of a device. This type does not have any data associeated with
+  it.  On a PING a device shall respond with a PONG in order to assure the orig‐
+  inal sender of its reachability.  It is described with the value 0x1 (1) in
+  the packet type field.
+
+                           Typical ping‐pong exchange
+
+                          CLIENT_1 ‐> PING ‐> CLIENT_2
+                          CLIENT_1 <‐ PONG <‐ CLIENT_2
+
+
+[1m3.2.  PONG[0m
+
+  The PONG packet type describes a response to a previous PING packet. It is
+  used to assure the availability of the receiver to the original sender.  PONG
+  is an obligatory response to a PING packet. If a client does not respond to a
+  PING with a PONG, the original sender will assume that the receiver is not
+  reachable. This type does not have any data paired with.  It is described with
+  the value 0x2 (2) in the packet type field.
+
+
+[1m3.3.  SERVICE[0m
+
+  The SERVICE packet is used to describe a payload type, in order for the
+  receiver to know what type of data will follow the header. If a SERVICE type
+  is specified, a data payload MUST follow the header. A data payload shall
+  always be in the following frame:
+
+                              Example Service Payload
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │        Service Type           │             Data Length             │
+├───────┼───────────────────────────────┴─────────────────────────────────────┤
+│ 2     │                            Data ...                                 │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+
+  The Service Type field describes a 1 byte code used to define the service that
+  this payload is processed with. Data Length describes the size of the follow‐
+  ing data field. One can chain multiple SERVICE payloads:
+
+
+
+MeshNet                                                                 [Page 7]
+
+
+
+
+
+December 2017                          ‐8‐                 Node to Node Protocol
+
+
+                               Two services payloads
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │      First Service Type       │         First Data Length           │
+├───────┼───────────────────────────────┴─────────────────────────────────────┤
+│ 2     │                                                                     │
+├───────┤                          First Data                                 │
+│ X     │                                                                     │
+├───────┼───────────────────────────────┬─────────────────────────────────────┤
+│ X     │     Second Service Type       │         Second Data Length          │
+├───────┼───────────────────────────────┴─────────────────────────────────────┤
+│ X     │                                                                     │
+├───────┤                         Second Data                                 │
+│ X     │                                                                     │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+
+  See the SERVICES general section for more information about the content of
+  data. The SERVICE packet type is described with 0x3 (3) in the packet type
+  field.
+
+
+[1m3.4.  PEERS[0m
+
+  The PEERS packet type describes the state of a node with its neighbors. It can
+  be used for different purposes, when a client is joining the network, to
+  update the score of a peer or when a node looses a peer. It is described with
+  the value 0x4 (4) in the packet type field.
+
+                                PEERS packet header
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │           Peer size           │                Data                 │
+├───────┼───────────────────────────────┘                                     │
+│ 2     │                            Data ...                                 │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+
+  The Peer size field describes the number of score‐ID couples present in the
+  packet. A score ‐ device ID pair is a simple data structure:
+
+
+
+
+
+MeshNet                                                                 [Page 8]
+
+
+
+
+
+December 2017                          ‐9‐                 Node to Node Protocol
+
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━╇━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │             Score             │             Device ID               │
+├───────┼───────────────────────────────┘                                     │
+│ 2     │                            Device ID                                │
+├───────┤                               ┌─────────────────────────────────────┘
+│ 4     │             Device ID         │
+└───────┴───────────────────────────────┘
+
+  The Score field describes the current score of the Device ID node perceived by
+  the source node; It is used to choose a best path when routing is needed.  The
+  Device ID describes the peer device ID on 4 bytes.
+
+  Those packets are broadcast by nature; if a client happens to receive a PEERS
+  packet, the Destination Device Identifier in the N2NP header shall be set to
+  0. Upon joining, a new node wanting to announce itself on the network must use
+  a PEER packet: it announces the current peers of the node, and their score.
+  For peer list and score calculation, see the relevant section. It is also used
+  when a node want to announce an update on his peers: a peer has been lost, a
+  peer score has changed, or a new peer has arrived.
+
+  Upon reception of a PEER packet, a client must update his internal routing ta‐
+  ble with the information in the PEER packet. A routing table entry consists of
+  two things: the mother device ID, and a list of paired score‐IDS of the peers
+  linked with the mother device. It could be represented like this:
+
+    struct {
+        uint32_t        node_id;
+
+        struct {
+            uint8_t             score;
+            uint32_t            id;
+            struct list_head    next;
+        } neighbors;
+    };
+
+  The PEER packet is join‐agnostic: a client receiving a packet must not care if
+  the sender just joined the network or is just updating information about his
+  peers. The client must update his internal routing table either way, and cre‐
+  ate a new entry when it is required. A C representation of the routing table
+  could be:
+
+    typedef struct {
+        struct node_entry_s {
+            uint32_t    node_id;
+
+
+
+MeshNet                                                                 [Page 9]
+
+
+
+
+
+December 2017                         ‐10‐                 Node to Node Protocol
+
+
+            struct {
+                uint8_t                 score;
+                struct node_entry_s     *id;
+                struct list_head        next;
+            };
+
+            struct list_head            next;
+        };
+    } routing_table_t;
+
+  It is worth noting that a pointer or a 32 bits unsigned int for the ID field
+  will be the same thing, as both types takes 4 bytes in ARMv5l. Theoretically,
+  an entry will size 25 bytes in memory; In practice, GCC will align the struct
+  on an 8 byte word, therefore padding the structure up to 32 bytes.
+
+
+[1m4.  SERVICES[0m
+
+[1m4.1.  CHAT[0m
+
+
+  The CHAT service is used to describe a chat message between two or more users.
+  It is described by the value 0x1 (1) in the service type field.
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │                                                                     │
+├───────┤                       Sequence Number                               │
+│ 2     │                                                                     │
+├───────┼──────────────────────────────┬──────────────────────────────────────┤
+│ 4     │            Flags             │          Message Length              │
+├───────┼──────────────────────────────┴──────────────────────────────────────┤
+│ 6     │                            Data                                     │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+
+
+[1m4.1.1.  Sequence Number[0m
+
+  The Sequence Number field is used to describe a sequence in the communication.
+  This information is useful to the devices in order to track a progression in a
+  communication. On the beginning of a session, the first packet sender shall
+  set this field to 0. The mechanic behind it is the same as TCP [1] , the
+───────────
+  1 Information Sciences Institute, “TCP RFC793” in [4mINTERNET[24m [4mSTAN‐[0m
+[4mDARD[24m (September 1981).
+
+
+
+MeshNet                                                                [Page 10]
+
+
+
+
+
+December 2017                         ‐11‐                 Node to Node Protocol
+
+
+  receiver shall increment this field with the length of the data it received.
+
+                          Example of a communication
+
+      CLIENT_1 ‐>      CHAT "Hello", MSG, sequence_number = 0        ‐> CLIENT_2
+      CLIENT_1 <‐ CHAT "Hey there !", MSG & ACK, sequence_number = 5 <‐ CLIENT_2
+      CLIENT_1 ‐>          CHAT, ACK, sequence_number = 17           ‐> CLIENT_2
+
+  The ACK flag is described in the 4.1.3 section.  If a sequence number exceeds
+  the maximum value of a 2 byte integer the client that will overflow the
+  sequence number shall start over at 1.
+
+[1m4.1.2.  Flags[0m
+
+  The Flags field is used to describe multiple boolean informations
+
+                               1... .... = ACK
+                               .1.. .... = CHA
+                               ..1. .... = FRG
+                               ...1 .... = MSG
+                               .... 1... = CRT
+                               .... .1.. = UPD
+                               .... ..1. = Reserved
+                               .... ...1 = Reserved
+
+  The ACK flag describes an acknowledgment of data. If the ACK flag is set, the
+  sequence number field shall contain the sequence of the data acknowledged.
+
+  The CHA flag describes a message that is to be sent to multiple people (a
+  Channel). If this flag is set, the payload will not be a simple UTF‐8 message,
+  but rather this payload:
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │                          Channel ID                                 │
+├───────┼─────────────────────────────────────────────────────────────────────┤
+│ 2     │                             Data                                    │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+
+  The Channel ID, 2 bytes in legth, describes the ID of a channel that a client
+  wants to pass his message to. This ID is handled with the CRT message
+  mechanic, see the appropriate section for more information. This packet is, in
+  essence, a broadcast; The destination device ID should be set to 0. Every
+  client must relay this message to their neighbors, and log it internally. This
+  way, when a client joins a channel, it will have a history (at least from the
+
+
+
+MeshNet                                                                [Page 11]
+
+
+
+
+
+December 2017                         ‐12‐                 Node to Node Protocol
+
+
+  moment he joined the network). When a client wants to join / leave a channel,
+  he will be doing this internally, without announcing it to the network.
+
+  A client must deduce the data length from the following math:
+
+                   chat‐>message_length ‐ sizeof(CHA‐>channel_id)
+
+  The FRG flag describes a fragmentation of data. If this flag is set, the
+  receiver shall expect one or more further packets in order to complete the
+  data.
+
+                         Incorrect fragmented exchange:
+
+              CLIENT_1 ‐> CHAT "Hello", FRG & MSG, seq = 0 ‐> CLIENT_2
+              CLIENT_1 <‐        CHAT, ACK, seq = 5        <‐ CLIENT_2
+              CLIENT_1 ‐>   CHAT "World !", MSG, seq = 0   ‐> CLIENT_2
+              CLIENT_1 <‐        CHAT, ACK, seq = 12       <‐ CLIENT_2
+
+    In the example above, one can see that CLIENT_2 ACKed the data before
+    the reception of the second and final packet: this is not standard;
+    CLIENT_1 shall not wait for an acknowledgment of data before sending more
+    fragmented packets. The exchange above should have happened like this:
+
+                          Correct fragmented exchange:
+
+              CLIENT_1 ‐> CHAT "Hello", FRG & MSG, seq = 0 ‐> CLIENT_2
+              CLIENT_1 ‐>   CHAT "World !", MSG, seq = 0   ‐> CLIENT_2
+              CLIENT_1 <‐       CHAT, ACK, seq = 12        <‐ CLIENT_2
+
+  A client must unset the FRG flag when sending the final packet of fragmented
+  data; otherwise the other client will wait indefinitely for another packet.
+
+  The MSG flag describes a standard chat exchange: the payload will be nothing
+  more than a normal UTF‐8 message. This flag cannot be set with the CHA flag.
+
+  The CRT flag describes the creation of a channel to the entire network, and
+  announce a channel ID with a human‐readable name. If this flag is set, the
+  payload will not be a simple UTF‐8 message, but rather this payload:
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │                          Channel ID                                 │
+├───────┼─────────────────────────────────────────────────────────────────────┤
+│ 2     │                         Channel Name                                │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+
+
+
+MeshNet                                                                [Page 12]
+
+
+
+
+
+December 2017                         ‐13‐                 Node to Node Protocol
+
+
+  The channel ID will be used for all the exchanges to come on this particular
+  channel: A client must save it internally. If a CHA message would arrive, and
+  a client did not know the concerned ID, this packet must be queued waiting for
+  a CRT packet to come.
+
+  In case of a join / re‐join, when a client was not connected during the time
+  of the creation of a channel, this client, upon reception of a CHA packet,
+  must ask his direct neighbors an update of his internal channel ID table. He
+  will be doing so using the UPD flag.
+
+  The UPD flag describes a request from a client whose internal channel ID table
+  is outdated, whether he was disonnected at the time of the creation, or simply
+  miss it, to his direct neighbors. The payload shall be simply:
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │                          Channel ID                                 │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+
+  And the neighbors, upon reception must look in their internal channel ID ta‐
+  ble, and respond with a simple payload too:
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │                         Channel Name                                │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+
+  The ACK and UPD flag must be set for this response.  In the case where the
+  neighbor does not know the channel ID either, it must ask his neighbors (minus
+  the original sender) for this information, following the same process. Upon
+  reception of the response, it must update his table, and pass the information
+  to the original sender.
+
+
+[1m4.1.3.  Message[0m
+
+  The Message field contains the payload message sent by the user to another
+  one. It is assumed that this field is encoded with UTF‐8. The size of this
+  field is described in the Message Length field. If this field is set to 0, it
+  is assumed that the Message field will be empty.
+
+
+
+
+
+
+MeshNet                                                                [Page 13]
+
+
+
+
+
+December 2017                         ‐14‐                 Node to Node Protocol
+
+
+[1m4.2.  BROADCAST[0m
+
+  The BROADCAST packet is used to describe a global message that needs to be
+  sent to all the members of the network. It is described by the value 0x2 (2)
+  in the service type field.  It is worth noting that with this packet, the con‐
+  cept of destination is voided, since everyone on the network shall receive
+  this packet. In this case, the Destination Device ID field in the N2NP header
+  frame shall be set to 0 (zero).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MeshNet                                                                [Page 14]
+
+
+
+
+
+December 2017                         ‐15‐                 Node to Node Protocol
+
+
+┏━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Octet ┃               0               ┃                 1                   ┃
+┃       ┣━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━┳━━━╋━━━┳━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┫
+┃       ┃ 0 ┃ 1 ┃ 2 ┃ 3 ┃ 4 ┃ 5 ┃ 6 ┃ 7 ┃ 8 ┃ 9 ┃ 10 ┃ 11 ┃ 12 ┃ 13 ┃ 14 ┃ 15 ┃
+┡━━━━━━━╇━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┻━━━━┩
+│ 0     │                                                                     │
+├───────┤                                                                     │
+│ 2     │                                                                     │
+├───────┤                        Issued Timestamp                             │
+│ 4     │                                                                     │
+├───────┤                                                                     │
+│ 6     │                                                                     │
+├───────┼──────────────────────────────┬──────────────────────────────────────┤
+│ 8     │           Expires            │          Message Length              │
+├───────┼──────────────────────────────┴──────────────────────────────────────┤
+│ 10    │                           Message                                   │
+└───────┴─────────────────────────────────────────────────────────────────────┘
+
+
+[1m4.2.1.  Issued Timestamp & Expires[0m
+
+  The first eight bytes describes a Unix EPOCH timestamp. This timestamp is the
+  time at which the original author sent the broadcast. It can’t be in the
+  future, if such a thing would happen, a client must drop the broadcast, and
+  not relay it. The Expires field describes the number of hours that the broad‐
+  cast is valid starting from the Issued timestamp. Clients should be doing the
+  following addition in order to check the validity of a broadcast
+
+                  Condition to check the validity of broadcast
+
+                time(NULL) < issued_timestamp + (expires * 3600)
+
+
+[1m4.2.2.  Message[0m
+
+  The Message field contains the data to be delivered; It is not formatted in
+  any fashion. In order to get the size of this data, one must use the Message
+  Length field.
+
+
+
+
+
+
+
+
+
+
+
+
+
+MeshNet                                                                [Page 15]
+
+
+
+
+
+December 2017                         ‐16‐                 Node to Node Protocol
+
+
+[1m5.  ROUTING[0m
+
+Within the N2NP protocol, routing is done in a special way. Since the network
+mesh is router‐less, the routing protocol needs to be gateway agnostic. We also
+have low‐data requirements due to the physical transportation limitation.  Also,
+as a node on the network may be moving, high reliability is a must.
+
+The entire routing is based on the principle that all nodes on the network know
+every node’s neighbors; therefore, every node can determine a path for every
+packet.
+
+
+[1m5.1.  Peer Information[0m
+
+  Peer’s neighbors are not the only information provided by every host on the
+  network; every host assigns a score to their neighbors, based on signal
+  strength and distance. This value is to be used in the heuristic algorithm in
+  order to evaluate the weight of a path.
+
+
+[1m5.1.1.  Score calculation[0m
+
+  A score describes the state of a node from the point of view of another node.
+  Those two nodes must be within physical reach of each other for a score to be
+  determined: it is used as weight value for the path‐finding heuristic.  A
+  score is determined through the following equation / heuristic:
+
+           /!\ To be determined, needs to be on one byte maximum /!\
+
+
+[1m5.1.2.  Update Broadcast[0m
+
+  This broadcast is launched when one of the following conditions are met: ‐ A
+  new node is joining the network ‐ An existing node got a new neighbor (New
+  client or a moving node) ‐ A node has timed out ‐ A peer score has changed
+
+  In all of these cases, the main node needs to update the whole network with
+  this new information; In order to calculate a path reliably, every node on the
+  network must know the neighbors of everyone: it is not intended to be a real‐
+  time information, but rather an indicative information.  In order to do that,
+  the node must send a PEERS packet with all the neighbors information. If a
+  peer did timeout, the main node must sent a PEER entry with a score of 0
+  (zero). If a peer did not change score, the main node must not add it in its
+  PEERS packet.
+
+
+
+
+
+
+
+MeshNet                                                                [Page 16]
+
+
+
+
+
+December 2017                         ‐17‐                 Node to Node Protocol
+
+
+[1m5.1.3.  Update broadcast data optimization[0m
+
+  In order to optimize usage of data bandwidth, broadcast peer update data must
+  be packed whenever possible.
+
+  If a node B is to retransmit the update data of the node A, and the node B
+  itself has broadcast data in the output pipe, the B node must pack the node A
+  information with it’s information, and send only one packet to be relayed by
+  its peers.
+
+  Of course, this packed data length should not exceed the packet maximum size,
+  otherwise the first packet must be relayed without re‐writing, and the second
+  one sent as well. A client, receiving broadcast update data from multiple
+  clients in one packet must deduce the number of nodes implicated by looking at
+  the total length in the N2NP header.
+
+
+[1m5.2.  ROUTING ALGORITHM[0m
+
+When a packet is sent from one device with the intent of speaking to a another
+device directly, routing must be involved. In order to assure delivering reli‐
+ably, the N2NP uses a mix between the HEAT algorithm, with node score attribu‐
+tion, and a static route routing algorithm. You can find the details about score
+attribution in the relevant section, along with the routing table information.
+
+
+[1m5.2.1.  General Description[0m
+
+  The concept of this routing algorithm is quite simple: every node bound to
+  route a packet from node A to node B must determine which route is the best,
+  on every hop.
+
+  Let’s say we have node A wanting to send a packet to node Z; the simple sce‐
+  nario is that those two nodes are physically next to each other: therefore, no
+  routing is needed.
+
+  But, if those two nodes are not directly connected to each other, node A must
+  determine the best route to reach node Z. In order to do that, and with all
+  the information about all the nodes on the network (See PEERS), node A must
+  run a heuristic algorithm on all his peer nodes (physically connected) with
+  the score of each node as weight.
+
+  In order not to loose time in the process, the depth used for the algorithm
+  should be minimal: node A does not need to determine an exact perfect path all
+  the way to node Z, but rather choose the direct peer that will be most suited
+  to route this packet.
+
+
+
+
+
+MeshNet                                                                [Page 17]
+
+
+
+
+
+December 2017                         ‐18‐                 Node to Node Protocol
+
+
+                              Example mesh network
+
+                / ‐ Node C ‐ \              /‐‐‐ Node E ‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐ \
+       / Node B                Node D ‐‐‐> Node F                          \
+Node A         \ Node G ‐‐‐‐‐ /    |           \‐‐ Node H                Node Z
+                                    \ Node I             \ ‐‐‐  Node J ‐‐‐ /
+
+
+  Let’s take the above schema: node A still wants to reach node Z.  In order to
+  do that, node A must determine the best path through one of his direct peers;
+  in this case it’s quite simple; node A only has one peer.
+
+  Node A sends the packet to node B, and it’s now the turn of node B to deter‐
+  mine the best path through one of his direct peers. Here, we got two peer
+  nodes: C and G. With the score of both it’s direct peers, and all the ones
+  beyond these, node B must now determine the best path to route this packet.
+
+  It is important to note that node B’s internal routing table, that describes
+  all the scores of everyone on the network, does not need to be updated in real
+  time: the node can determine a good‐enough path to the next hop with its data.
+
+  Let’s say, for the sake of the example, that node C has a score of 40, and G a
+  score of 55. Since both C and G share the same output node, D, their exit
+  score will be the same. So the node B must compare the score of C and G in
+  order to route the packet properly.
+
+  In this example, G got a bigger score than C, so node B will route the packet
+  to G. Node G, upon reception, will do the same algorithm in order to route the
+  packet to the next node, and the next node will do the same, and so on until
+  the destination node is reached.
+
+
+
+[1m5.2.2.  Dijkstra’s algorithm[0m
+
+  In order to compute the best path for a packet, a node must use Dijkstra’s
+  algorithm [2]. Instead of using distance as a sole weight parameter, the score
+  of the nodes is to be used. See the relevant sections for score calculations.
+
+
+[1m5.2.3.  Broadcast routing[0m
+
+  By nature, broadcast packets do not have a destination: All the members of the
+  networks shall receive the packet. Therefore, the routing algorithm cannot be
+  used in this case. A flood routing algorithm shall be used.
+
+───────────
+  2 Melissa Yan, “Dijkstra’s Algorithm” in [4mMIT[24m (2007).
+
+
+
+MeshNet                                                                [Page 18]
+
+
+
+
+
+December 2017                         ‐19‐                 Node to Node Protocol
+
+
+                             Simple 4 nodes network
+
+                                     Node A
+                                    /     \
+                               Node B     Node D
+                                    \     /
+                                     Node C
+
+  Lets take the above schema: in this example, node A wants to broadcast a
+  packet to the network: first, it will send it to his direct neighbors: B and
+  D. Before sending, the node must compute a checksum of the full packet, start‐
+  ing at the N2NP header, and store it.
+
+  The node D, upon reception of the packet, and before treatment in userland,
+  must do the same: compute a checksum, and send the packet to his direct neigh‐
+  bors, A and C. C has never seen the packet before: therefore it will compute
+  and relay it.
+
+  But the node A has already seen the packet (Since he’s the one who sent it).
+  So, upon reception, A will compute the checksum, check with his internal stor‐
+  age, see that this packet has already been relayed, and simply drop it.
+
+  With this method, we keep simplicity through routing, without much data over‐
+  head and broadcast replay problems.
+
+
+[1m5.2.4.  Protocol routing[0m
+
+  When the next peer ID has been determined, the node must physically route and
+  send the packet to the said node. In order to do that, the field ’Next Physi‐
+  cal Device Identifier’ in the header (Section 2.2 Frame) must be set to this
+  ID.
+
+  The two other fields, Source / Destination ID, should not be changed in any
+  way by a relay‐node; it is not necessary.
+
+  Upon reception of a packet, a node should look at those fields:
+
+  ‐ If the Destination Device ID is his ID and the Next Physical ID is set to 0,
+  the packet should be sent to userspace for treatment.
+
+  ‐ If the Destination Device ID is not his ID but the Next Physical ID is, the
+  packet should not leave kernel‐space and be properly relayed according to this
+  specification (Section 5 ROUTING).
+
+  ‐ Otherwise, the packet should be dropped.
+
+
+
+
+
+MeshNet                                                                [Page 19]
+
+
